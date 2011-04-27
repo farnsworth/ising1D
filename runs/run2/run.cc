@@ -80,5 +80,5 @@ int main(int argc, char *argv[])
     return -1;
   }
   
-  _ERROR_TRACKING_;
+  _ERROR_TRACKING_(-1);
 }

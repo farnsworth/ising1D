@@ -72,7 +72,7 @@ loop<T>::loop(in_file *file, const string name)
   initval = 0;
   read( file, name );
 #ifdef DEBUG
-  _ERROR_TRACKING_;
+  _ERROR_TRACKING_();
 #endif
 }
 
@@ -94,7 +94,7 @@ void loop<T>::read(in_file *file, const string tagname)
       istringstream(data) >> initval;
   }
 #ifdef DEBUG
-  _ERROR_TRACKING_;
+  _ERROR_TRACKING_();
 #endif
 }
 

@@ -110,12 +110,12 @@ matrix<T>& matrix<T>::operator=( const matrix<T> &source)
 template <class T>
 matrix<T> operator+(const matrix<T> &c1, const matrix<T> &c2)
 {
+  matrix<T> result(c1.nrow,c1.ncol);
+
   if ( (c1.nrow != c2.nrow)||(c1.ncol != c2.ncol)){
     _ERROR_("you are summing two matrices with different size");
-    exit;
+    return result;
   }
-
-  matrix<T> result(c1.nrow,c1.ncol);
 
   for (int i=0;i<c1.nrow*c1.ncol;++i)
     result.pointer[i] = c1.pointer[i] + c2.pointer[i];
@@ -127,12 +127,12 @@ matrix<T> operator+(const matrix<T> &c1, const matrix<T> &c2)
 template <class T>
 matrix<T> operator-(const matrix<T> &c1, const matrix<T> &c2)
 {
+  matrix<T> result(c1.nrow,c1.ncol);
+  
   if ( (c1.nrow != c2.nrow)||(c1.ncol != c2.ncol)){
     _ERROR_("you are summing two matrices with different size");
-    exit;
+    return result;
   }
-
-  matrix<T> result(c1.nrow,c1.ncol);
 
   for (int i=0;i<c1.nrow*c1.ncol;++i)
     result.pointer[i] = c1.pointer[i] - c2.pointer[i];
@@ -144,12 +144,13 @@ matrix<T> operator-(const matrix<T> &c1, const matrix<T> &c2)
 template <class T>
 matrix<T> operator*(const matrix<T> &c1,const matrix<T> &c2)
 {
+  matrix<T> result(c1.nrow,c2.ncol);
+  
   if (c1.ncol != c2.nrow){
     _ERROR_("you are multipling  two incompatible matrices");
-    exit;
+    return result;
   }
   
-  matrix<T> result(c1.nrow,c2.ncol);
   result = 0.0;
   
   for (int irow=0;irow<c1.nrow;++irow)
@@ -189,12 +190,13 @@ matrix<T> operator*(const matrix<T> &source, const T alpha )
 template <class T>
 matrix< complex<T> > operator*(const matrix< complex<T> > &c1, const matrix<T> &c2)
 {
+  matrix< complex<T> > result(c1.nrow,c2.ncol);
+
   if (c1.ncol != c2.nrow){
     _ERROR_("you are multipling  two incompatible matrices");
-    exit;
+    return result;
   }
   
-  matrix< complex<T> > result(c1.nrow,c2.ncol);
   result = complex<T>(0.0,0.0);
   
   for (int irow=0;irow<c1.nrow;++irow)
@@ -208,12 +210,13 @@ matrix< complex<T> > operator*(const matrix< complex<T> > &c1, const matrix<T> &
 template <class T>
 matrix< complex<T> > operator*( const matrix<T> &c1, const matrix< complex<T> > &c2 )
 {
+  matrix< complex<T> > result(c1.nrow,c2.ncol);
+
   if (c1.ncol != c2.nrow){
     _ERROR_("you are multipling  two incompatible matrices");
-    exit;
+    return result;
   }
   
-  matrix< complex<T> > result(c1.nrow,c2.ncol);
   result = complex<T>(0.0,0.0);
   
   for (int irow=0;irow<c1.nrow;++irow)

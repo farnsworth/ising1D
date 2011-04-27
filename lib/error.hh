@@ -4,10 +4,10 @@
 
 #define _ERROR_(a) error(__FILE__,__FUNCTION__,__LINE__,a)
 #define _WARNING_(a) warning(__FILE__,__FUNCTION__,__LINE__,a)
-#define _ERROR_TRACKING_ do {				\
+#define _ERROR_TRACKING_(a) do {			\
     if (ierr > 0){					\
       error_tracking(__FILE__,__FUNCTION__,__LINE__);	\
-      exit;						\
+      return a;						\
     }							\
   } while(0)
 
