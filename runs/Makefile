@@ -11,12 +11,9 @@ COMPILER=g++
 
 INCLUDEDIR=-I../external -I../lib
 
-ISING1DLIB=$(DIR)/lib/matrices.o $(DIR)/lib/error.o $(DIR)/lib/io.o $(DIR)/lib/common.o $(DIR)/lib/ising1D.o
+ISING1DLIB=$(DIR)/lib/matrices.o $(DIR)/lib/error.o $(DIR)/lib/io.o $(DIR)/lib/common.o $(DIR)/lib/ising1D.o $(DIR)/random.o
 
 UNAME := $(shell uname)
-
-DIRLIB=-L$(DIR)/external
-LIB=-lrandom.o
 
 ifeq ($(UNAME), Linux)
    DIRLIB+=-L/u/shared/programs/noarch/mkl/10.2.3.029
