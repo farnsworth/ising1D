@@ -17,7 +17,7 @@ UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
    DIRLIB+=-L/u/shared/programs/noarch/mkl/10.2.3.029
-   LIB+=-lmkl_core -lmkl_lapack -lmkl_solver -lmkl_def -lmkl_intel -lmkl_intel_thread -liomp5 -lpthread
+   LIB=-lmkl_core -lmkl_lapack -lmkl_solver -lmkl_def -lmkl_intel -lmkl_intel_thread -liomp5 -lpthread
 endif
 
 ifeq ($(UNAME), Darwin)
