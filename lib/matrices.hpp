@@ -257,3 +257,9 @@ extern double* matrix<double>::diagonalize( bool evect );
 
 template <>
 extern matrix< complex<double> > matrix< complex<double> >::conjugate();
+
+template<>
+extern double matrix<double>::det();
+
+template <>
+extern complex<double> matrix< complex<double> >::det();
