@@ -3,6 +3,7 @@
 
 #include "matrices.hh"
 #include "io.hh"
+#include "error.hh"
 #include <string>
 
 double fermi_dist(double, double);
