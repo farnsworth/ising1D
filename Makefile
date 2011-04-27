@@ -14,6 +14,6 @@ DIRS=$(shell ls -d */)
 
 clean-all:
 	@rm -f *.o out *~
-#	@for dir in $(DIRLIB);do \
-#	$(MAKE) -C$${dir} clean; \
-#	done;
+	@for dir in $(DIRS);do \
+	$(MAKE) -C$${dir} clean; \
+	done;
