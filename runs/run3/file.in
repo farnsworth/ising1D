@@ -1,0 +1,20 @@
+[parameters]
+fileout	file100.out
+time	100.0
+[loop]
+delta	1
+steps	20
+[system0]
+size	100
+h	0.9
+J	1
+gamma	1
+epsilon	0.0
+pbc	1
+[system]
+size	100
+h	0.5
+J	1
+gamma	1
+epsilon	0.0
+pbc	1

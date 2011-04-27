@@ -1,0 +1,5 @@
+PROJECT_NAME     = ising1D
+INPUT            = ising1D.hh
+WARNINGS         = YES
+PERL_PATH        = /opt/local/bin/perl
+SEARCHENGINE     = YES
