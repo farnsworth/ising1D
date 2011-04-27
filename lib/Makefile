@@ -10,7 +10,7 @@ HEADERS_CODE = $(shell ls *.hpp)
 
 INCLUDEDIR=-I../external/
 #FLAGS=-framework veclib
-FLAGS = "-O3"
+FLAGS =-O3
 
 default: $(HEADERS) $(HEADERS_CODE) $(OBJECTS)
 
