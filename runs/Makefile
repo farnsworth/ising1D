@@ -5,48 +5,49 @@ MF=run$(NRUN)/run.cc
 MFO=$(MF:.cc=.o)
 OUT=run$(NRUN)/out
 
+DIR=$(shell pwd)/..
 
 COMPILER=g++
 
-DIRLIB=../external ../lib
-DIRLIBFLAG=-L../external -L../lib
 INCLUDEDIR=-I../external -I../lib
 
-LIB=-lrandom.o -lmatrices.o -lerror.o -lio.o -lcommon.o -lising1D.o
+ISING1DLIB=$(DIR)/lib/matrices.o $(DIR)/lib/error.o $(DIR)/lib/io.o $(DIR)/lib/common.o $(DIR)/lib/ising1D.o
 
 UNAME := $(shell uname)
 
-FLAGS=-DDEBUG
+DIRLIB=-L$(DIR)/external
+LIB=-lrandom.o
 
 ifeq ($(UNAME), Linux)
-
+   DIRLIB+=-L/u/shared/programs/noarch/mkl/10.2.3.029
+   LIB+=-lmkl_core -lmkl_lapack -lmkl_solver -lmkl_def -lmkl_intel -lmkl_intel_thread -liomp5 -lpthread
 endif
 
 ifeq ($(UNAME), Darwin)
-   FLAGS += -framework veclib
+   LIB += -framework veclib
 endif
 
+COMMAND:= $(COMPILER) $(FLAGS) $(DIRLIB) $(LIB) $(ISING1DLIB) $(MFO) -o $(OUT)
 
-
-default: $(MFO)
+default: FLAGS += -DDEBUG
+default: $(MFO) $(ISING1DLIB)
 	@echo $(MF)
-	@for dir in $(DIRLIB);do \
-	$(MAKE) -C$${dir}; \
-	done;
-	$(COMPILER) $(FLAGS) $(DIRLIBFLAG) $(LIB) $(MFO) -o $(OUT)
+	$(COMMAND)
 
 
-fast: FLAGS=-O3
-fast: $(MFO)
-	@echo $(MF)
-	@for dir in $(DIRLIB);do \
-	$(MAKE) -C$${dir} FLAGS=$(FLAGS); \
-	done;
-	$(COMPILER) $(FLAGS) $(DIRLIBFLAG) $(LIB) $(MFO) -o $(OUT)
+fast: FLAGS += -O3
+fast: $(MFO) $(ISING1DLIB)
+	$(COMMAND)
 
 clean:
 	@rm -f *.o out *~
 	@rm -f run*/*.o run*/*out run*/*~
 
 %.o: %.cc
+	echo $(DIR)
 	$(COMPILER) $(FLAGS) $(INCLUDEDIR) -c $< -o $*.o
+
+
+#@for dir in $(DIRLIB);do \
+#$(MAKE) -C$${dir}; \
+#done;
