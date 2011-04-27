@@ -11,7 +11,7 @@ COMPILER=g++
 
 INCLUDEDIR=-I../external -I../lib
 
-ISING1DLIB=$(DIR)/lib/matrices.o $(DIR)/lib/error.o $(DIR)/lib/io.o $(DIR)/lib/common.o $(DIR)/lib/ising1D.o $(DIR)/random.o
+ISING1DLIB=$(DIR)/lib/matrices.o $(DIR)/lib/error.o $(DIR)/lib/io.o $(DIR)/lib/common.o $(DIR)/lib/ising1D.o $(DIR)/external/random.o
 
 UNAME := $(shell uname)
 
