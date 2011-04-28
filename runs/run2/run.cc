@@ -1,6 +1,5 @@
 
 #include "ising1D.hh"
-#include "random.hh"
 #include "error.hh"
 #include "io.hh"
 #include "common.hh"
@@ -8,7 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <time.h>
 #include <complex>
 using namespace std;
 
@@ -19,25 +17,19 @@ int main(int argc, char *argv[])
 
   if (argc > 1){
     int maxdist;
-    double time;
+    double t;
     string name,data,fileout="file.out";
 
     string filename = argv[1];
-
-    int seed = time(NULL);
 
     in_file ifile(filename);
     ifile.find_tag("parameters");
     while ( ifile.read_data(name,data)>0){
       if (name=="time")
-	istringstream(data) >> time;
+	istringstream(data) >> t;
       else if (name=="fileout")
 	fileout = data;
-      else if (name=="seed")
-	istringstream(data) >> seed;
     }
-
-    rand_init( &seed );
     out_file ofile(fileout);
 
     ofile.copyfile( &ifile );
@@ -62,10 +54,10 @@ int main(int argc, char *argv[])
     ofile << setprecision(10) << setw(20);
 
     while (time_loop.next()){
-      time = time_loop.get_val();
-      ofile << time << "\t";
+      t = time_loop.get_val();
+      ofile << t << "\t";
 
-      gigi.set_time_evolution(time);
+      gigi.set_time_evolution(t);
       ofile << tmag1.get_time_evolution(gigi.UUt, gigi.VVt)/double(gigi.get_size()) << "\t";
       ofile << mgge;
       

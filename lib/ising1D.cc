@@ -10,6 +10,7 @@
 #include <cmath>
 #include <string>
 #include <complex>
+#include <time.h>
 using namespace std;
 
 
@@ -339,6 +340,7 @@ ising1D::ising1D( in_file* file, const string name)
   gamma = _GAMMA_;
   epsilon = _EPSILON_;
   pbc = _PBC_;
+  _seed = _SEED_;
   read( file, name );
   init();
 #ifdef DEBUG
@@ -347,7 +349,7 @@ ising1D::ising1D( in_file* file, const string name)
 }
 
 
-ising1D::ising1D(int size_in, double h_in, double J_in, double epsilon_in, double gamma_in, bool pbc_in)
+ising1D::ising1D(int size_in, double h_in, double J_in, double epsilon_in, double gamma_in, bool pbc_in, int seed)
 {
   size = size_in;
   J = J_in;
@@ -355,6 +357,7 @@ ising1D::ising1D(int size_in, double h_in, double J_in, double epsilon_in, doubl
   gamma = gamma_in;
   pbc = pbc_in;
   epsilon = epsilon_in;
+  _seed = seed;
   init();
 #ifdef DEBUG
   _ERROR_TRACKING_;
@@ -371,6 +374,11 @@ void ising1D::init()
     _WARNING_("You are using PBC");
 
   hamiltonian = new matrix<double>(2*size,2*size);
+
+  if (_seed < 0)
+    _seed = time(NULL);
+
+  rand_init( &_seed );
   
   UU = new matrix<double>(size,size);
   VV = new matrix<double>(size,size);
@@ -576,6 +584,8 @@ void ising1D::read( in_file* file,const string systemname)
       istringstream(data) >> epsilon;
     else if (name=="pbc")
       istringstream(data) >> pbc;
+    else if (name=="seed")
+      istringstream(data) >> _seed;
   }
 #ifdef DEBUG
   _ERROR_TRACKING_;

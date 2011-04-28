@@ -24,8 +24,7 @@
 #define _GAMMA_ 1.0 /**< double value. Default x-y coupling. */
 #define _EPSILON_ 0.0 /**< double value. Default disorder. */
 #define _PBC_ true /**< boolean value. Default periodic boundary conditions. */
-
-
+#define _SEED_ -1 /**< default seed value. */
 
 
 class ising1D;
@@ -129,7 +128,7 @@ public:
   double epsilon;
   bool pbc;
   
-  ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_);
+  ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
 
   ising1D( in_file *file, const string name="system");
   ~ising1D();
@@ -149,6 +148,7 @@ private:
   void solve_diagonalization();
   matrix<double>  get_matrix_A();
   matrix<double>  get_matrix_B();
+  int _seed;
 };
 
 

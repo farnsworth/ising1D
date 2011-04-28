@@ -4,7 +4,7 @@ import numpy
 import sys
 
 if (len(sys.argv) != 2):
-    print "I need one file to elaborate"
+    print "I need a file to elaborate"
     exit()
 
 filename = sys.argv[1]
