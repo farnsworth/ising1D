@@ -14,8 +14,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  int seed = time(NULL);
-  rand_init( &seed );
+
 
 
   if (argc > 1){
@@ -25,6 +24,8 @@ int main(int argc, char *argv[])
 
     string filename = argv[1];
 
+    int seed = time(NULL);
+
     in_file ifile(filename);
     ifile.find_tag("parameters");
     while ( ifile.read_data(name,data)>0){
@@ -32,8 +33,11 @@ int main(int argc, char *argv[])
 	istringstream(data) >> time;
       else if (name=="fileout")
 	fileout = data;
+      else if (name=="seed")
+	istringstream(data) >> seed;
     }
-    
+
+    rand_init( &seed );
     out_file ofile(fileout);
 
     ofile.copyfile( &ifile );
