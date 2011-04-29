@@ -1,5 +1,11 @@
 
-COMPILER=g++
+ifneq ($(strip $(shell which g++)),)
+        COMPILER=g++
+endif
+
+ifneq ($(strip $(shell which icpc)),)
+        COMPILER=icpc
+endif
 
 SOURCE = $(shell ls *.cc)
 

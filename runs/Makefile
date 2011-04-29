@@ -7,7 +7,13 @@ OUT=run$(NRUN)/out
 
 DIR=$(shell pwd)/..
 
-COMPILER=g++
+ifneq ($(strip $(shell which g++)),)
+	COMPILER=g++
+endif
+
+ifneq ($(strip $(shell which icpc)),)
+	COMPILER=icpc
+endif
 
 INCLUDEDIR=-I../external -I../lib
 
@@ -17,10 +23,10 @@ UNAME := $(shell uname)
 MACHINE := $(shell uname -m)
 
 ifeq ($(UNAME), Linux)
-   ifeq ($(MACHINE,x86_64)
+   ifeq ($(MACHINE),x86_64)
       LIB=-lmkl_solver_lp64 -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread
    endif
-   ifeq ($(MACHINE,i686)
+   ifeq ($(MACHINE),i686)
       LIB=-lmkl_solver -Wl,--start-group -lmkl_intel -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread
 #   LIB=-lmkl_core -lmkl_lapack -lmkl_solver -lmkl_def -lmkl_intel -lmkl_intel_thread -liomp5 -lpthread
    endif
