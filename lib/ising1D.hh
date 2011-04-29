@@ -119,28 +119,18 @@ class ising1D{
 public:
   // length of the chain
   int size;
-  // parameters of the hamiltonian:
-  // H = - \sum_i J_i \sigma_i^x \sigma_{i+1}^x - \sum_i h_i \sigma^z_i
-  // hh[i] = h + epsilon*rand()
-  double *hh;
-  double *JJ;
-  double h,J,gamma;
-  double epsilon;
-  bool pbc;
   
   ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
 
   ising1D( in_file *file, const string name="system");
   ~ising1D();
 
-  // matrix that represent the Hamiltonian
-  matrix<double> *hamiltonian;
   matrix<double> *UU,*VV;
-  energy* e;
 
   void print();
   void write( out_file *);
   void read( in_file *, const string);
+  friend class quench;
 
 private:
   void init();
@@ -149,6 +139,14 @@ private:
   matrix<double>  get_matrix_A();
   matrix<double>  get_matrix_B();
   int _seed;
+  bool _pbc;
+  double _h,_J,_gamma;
+  double _epsilon;
+  double *_hh;
+  double *_JJ;
+  // matrix that represent the Hamiltonian
+  matrix<double> *_hamiltonian;
+  energy* e;
 };
 
 

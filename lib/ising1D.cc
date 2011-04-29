@@ -65,6 +65,9 @@ void tmag::set_spvs()
 
 
 BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< double >( system_in->size ){
+  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->size) || (j_in > system_in->size) ){
+    _ERROR_("indexes outside the chain");
+  }
   _system = system_in;
   _i = i_in;
   _j = j_in;
@@ -113,6 +116,9 @@ void BiAj::set_spvs()
 
 
 AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->size ){
+  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->size) || (j_in > system_in->size) ){
+    _ERROR_("indexes outside the chain");
+  }
   _system = system_in;
   _i = i_in;
   _j = j_in;
@@ -161,6 +167,9 @@ void AiAj::set_gsv()
 
 
 BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->size ){
+  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->size) || (j_in > system_in->size) ){
+    _ERROR_("indexes outside the chain");
+  }
   _system = system_in;
   _i = i_in;
   _j = j_in;
@@ -207,6 +216,9 @@ void BiBj::set_gsv()
 
 rho::rho( int i,int r, ising1D * system) : obs<double>( system->size)
 {
+  if ((i+r > system->size) || (i < 0)){
+    _ERROR_("indexes outside the chain");
+  }
   _system = system;
   _r = r;
   _i = i;
@@ -335,11 +347,11 @@ rho::~rho()
 ising1D::ising1D( in_file* file, const string name)
 {
   size = _SIZE_;
-  h = _H_;
-  J = _J_;
-  gamma = _GAMMA_;
-  epsilon = _EPSILON_;
-  pbc = _PBC_;
+  _h = _H_;
+  _J = _J_;
+  _gamma = _GAMMA_;
+  _epsilon = _EPSILON_;
+  _pbc = _PBC_;
   _seed = _SEED_;
   read( file, name );
   init();
@@ -349,14 +361,14 @@ ising1D::ising1D( in_file* file, const string name)
 }
 
 
-ising1D::ising1D(int size_in, double h_in, double J_in, double epsilon_in, double gamma_in, bool pbc_in, int seed)
+ising1D::ising1D(int size_in, double h, double J, double epsilon, double gamma, bool pbc, int seed)
 {
   size = size_in;
-  J = J_in;
-  h = h_in;
-  gamma = gamma_in;
-  pbc = pbc_in;
-  epsilon = epsilon_in;
+  _J = J;
+  _h = h;
+  _gamma = gamma;
+  _pbc = pbc;
+  _epsilon = epsilon;
   _seed = seed;
   init();
 #ifdef DEBUG
@@ -370,10 +382,13 @@ void ising1D::init()
   if (size<1)
     _ERROR_("Non valid value of size");
 
-  if (pbc)
+  if (size%2 == 1)
+    _WARNING_("Odd number of sites");
+
+  if (_pbc)
     _WARNING_("You are using PBC");
 
-  hamiltonian = new matrix<double>(2*size,2*size);
+  _hamiltonian = new matrix<double>(2*size,2*size);
 
   if (_seed < 0)
     _seed = time(NULL);
@@ -382,14 +397,14 @@ void ising1D::init()
   
   UU = new matrix<double>(size,size);
   VV = new matrix<double>(size,size);
-  JJ = new double[size];
-  hh = new double[size];
+  _JJ = new double[size];
+  _hh = new double[size];
   
   for (int i=0;i<size;++i){
-    hh[i] = h + 2.0*epsilon*(drand1()-0.5);
-    JJ[i] = J + 2.0*epsilon*(drand1()-0.5);
+    _hh[i] = _h + 2.0*_epsilon*(drand1()-0.5);
+    _JJ[i] = _J + 2.0*_epsilon*(drand1()-0.5);
   }
-  (*hamiltonian) = get_hamiltonian();
+  (*_hamiltonian) = get_hamiltonian();
   solve_diagonalization();
 #ifdef DEBUG
   _ERROR_TRACKING_;
@@ -434,7 +449,7 @@ void ising1D::solve_diagonalization()
       temph(irow+size,icol) = (*VV)(irow,icol) ;
       temph(irow,icol+size) = (*VV)(irow,icol);
     }
-  (temph.transpose() * *hamiltonian * temph).print();
+  (temph.transpose() * *_hamiltonian * temph).print();
   */
 
   delete [] eigenval;
@@ -479,16 +494,16 @@ matrix<double> ising1D::get_matrix_A()
   AA = 0.0;
   
   for (int irow=0;irow<size;++irow){
-    AA(irow,irow) = -hh[irow];
+    AA(irow,irow) = - _hh[irow];
     if (irow+1<size){
-      AA(irow,irow+1) = -JJ[irow]*0.5;
-      AA(irow+1,irow) = -JJ[irow]*0.5;
+      AA(irow,irow+1) = - _JJ[irow]*0.5;
+      AA(irow+1,irow) = - _JJ[irow]*0.5;
     }
   }
   
-  if (pbc){
-    AA(size-1,0) += JJ[size-1]*0.5;
-    AA(0,size-1) += JJ[size-1]*0.5;
+  if (_pbc){
+    AA(size-1,0) += _JJ[size-1]*0.5;
+    AA(0,size-1) += _JJ[size-1]*0.5;
   }
 
 #ifdef DEBUG
@@ -502,19 +517,19 @@ matrix<double> ising1D::get_matrix_B()
 {
   matrix<double> BB(size,size);
   //double temp = (1.0-gamma)/2.0;
-  double temp = gamma/2.0;
+  double temp = _gamma/2.0;
   
   BB = 0.0;
   
   for (int irow=0;irow<size-1;++irow){
-    BB(irow,irow+1) = -JJ[irow]*temp;
-    BB(irow+1,irow) =  JJ[irow]*temp;
+    BB(irow,irow+1) = - _JJ[irow]*temp;
+    BB(irow+1,irow) =  _JJ[irow]*temp;
     }
 
   // supposing even NF
-  if (pbc){
-    BB(size-1,0) += JJ[size-1]*temp;
-    BB(0,size-1) += -JJ[size-1]*temp;
+  if (_pbc){
+    BB(size-1,0) += _JJ[size-1]*temp;
+    BB(0,size-1) += - _JJ[size-1]*temp;
   }
 
 #ifdef DEBUG
@@ -526,23 +541,24 @@ matrix<double> ising1D::get_matrix_B()
 
 ising1D::~ising1D()
 {
-  delete [] JJ;
-  delete [] hh;
-  delete hamiltonian;
+  delete [] _JJ;
+  delete [] _hh;
+  delete _hamiltonian;
   delete UU;
   delete VV;
   delete e;
 }
 
 
+/*************************************************/
 void ising1D::print()
 {
   cout << "size = " << size << endl;
-  cout << "h = " << h << endl;
-  cout << "J = " << J << endl;
-  cout << "gamma = " << gamma << endl;
-  cout << "epsilon = " << epsilon << endl;
-  cout << "pbc = " << pbc << endl;
+  cout << "h = " << _h << endl;
+  cout << "J = " << _J << endl;
+  cout << "gamma = " << _gamma << endl;
+  cout << "epsilon = " << _epsilon << endl;
+  cout << "pbc = " << _pbc << endl;
 }
 
 
@@ -550,16 +566,18 @@ void ising1D::write(out_file* file)
 {
   file->write_tag("system");
   file->write_parameter("size", size );
-  file->write_parameter("h", h );
-  file->write_parameter("J", J );
-  file->write_parameter("epsilon", epsilon );
-  file->write_parameter("gamma", gamma );
-  file->write_parameter("pbc", pbc );
+  file->write_parameter("h", _h );
+  file->write_parameter("J", _J );
+  file->write_parameter("epsilon", _epsilon );
+  file->write_parameter("gamma", _gamma );
+  file->write_parameter("pbc", _pbc );
+  file->write_parameter("seed",_seed );
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
 }
 
+/*************************************************/
 
 void ising1D::read( in_file* file,const string systemname)
 {
@@ -575,15 +593,15 @@ void ising1D::read( in_file* file,const string systemname)
     if (name=="size")
       istringstream(data) >> size;
     else if (name=="h")
-      istringstream(data) >> h;
+      istringstream(data) >> _h;
     else if (name=="J")
-      istringstream(data) >> J;
+      istringstream(data) >> _J;
     else if (name=="gamma")
-      istringstream(data) >> gamma;
+      istringstream(data) >> _gamma;
     else if (name=="epsilon")
-      istringstream(data) >> epsilon;
+      istringstream(data) >> _epsilon;
     else if (name=="pbc")
-      istringstream(data) >> pbc;
+      istringstream(data) >> _pbc;
     else if (name=="seed")
       istringstream(data) >> _seed;
   }
@@ -593,10 +611,10 @@ void ising1D::read( in_file* file,const string systemname)
 }
 
 
-quench::quench( int size_in, double h0_in, double h_in, double J_in, double epsilon_in, double gamma_in, bool pbc_in)
+quench::quench( int size_in, double h0, double h, double J, double epsilon, double gamma, bool pbc)
 {
-  system0 = new ising1D(size_in, h0_in, J_in, epsilon_in, gamma_in, pbc_in);
-  system = new ising1D(size_in, h_in,  J_in, epsilon_in, gamma_in, pbc_in);
+  system0 = new ising1D(size_in, h0, J, epsilon, gamma, pbc);
+  system = new ising1D(size_in, h,  J, epsilon, gamma, pbc);
   init();
 #ifdef DEBUG
   _ERROR_TRACKING_;

@@ -16,7 +16,6 @@ ISING1DLIB=$(DIR)/lib/matrices.o $(DIR)/lib/error.o $(DIR)/lib/io.o $(DIR)/lib/c
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-   DIRLIB+=-L/u/shared/programs/noarch/mkl/10.2.3.029
    LIB=-lmkl_core -lmkl_lapack -lmkl_solver -lmkl_def -lmkl_intel -lmkl_intel_thread -liomp5 -lpthread
 endif
 
@@ -24,7 +23,7 @@ ifeq ($(UNAME), Darwin)
    LIB += -framework veclib
 endif
 
-COMMAND:= $(COMPILER) $(FLAGS) $(DIRLIB) $(LIB) $(ISING1DLIB) $(MFO) -o $(OUT)
+COMMAND:= $(COMPILER) $(FLAGS) $(LIB) $(ISING1DLIB) $(MFO) -o $(OUT)
 
 default: FLAGS += -DDEBUG
 default: $(MFO) $(ISING1DLIB)
