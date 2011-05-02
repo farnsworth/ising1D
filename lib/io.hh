@@ -8,7 +8,7 @@
 #include <string>
 using namespace std;
 
-#define TAB " "
+#define SEP " "
 
 class out_file;
 

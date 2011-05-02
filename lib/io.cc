@@ -48,7 +48,11 @@ int in_file::read_data( string &name, string &val )
     if (int(found)>=0){
       return -1;
     }
-    found = line.find(TAB);
+    found = line.find("#");
+    if (int(found)>=0){
+      continue;
+    }
+    found = line.find(SEP);
     if (int(found)<0)
       continue;
     name = line.substr(0,found);
