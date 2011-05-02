@@ -6,8 +6,6 @@
 #include <fstream>
 using namespace std;
 
-#define TAB "\t"
-
 in_file::in_file( const string filename )
 {
   file = new ifstream(filename.c_str());
@@ -50,7 +48,7 @@ int in_file::read_data( string &name, string &val )
     if (int(found)>=0){
       return -1;
     }
-    found = line.find("\t");
+    found = line.find(TAB);
     if (int(found)<0)
       continue;
     name = line.substr(0,found);

@@ -117,8 +117,6 @@ private:
 // general 1D ising model object
 class ising1D{
 public:
-  // length of the chain
-  int size;
   
   ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
 
@@ -130,6 +128,7 @@ public:
   void print();
   void write( out_file *);
   void read( in_file *, const string);
+  int get_size();
   friend class quench;
 
 private:
@@ -147,6 +146,8 @@ private:
   // matrix that represent the Hamiltonian
   matrix<double> *_hamiltonian;
   energy* e;
+  // length of the chain
+  int size;
 };
 
 

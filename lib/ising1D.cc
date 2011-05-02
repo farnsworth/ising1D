@@ -25,7 +25,7 @@ double energy::get_time_evolution( matrix< complex<double> > *UUt, matrix< compl
 
 
 
-tmag::tmag(ising1D * system_in) : local_obs<double>( system_in->size ){
+tmag::tmag(ising1D * system_in) : local_obs<double>( system_in->get_size() ){
   _system = system_in;
 }
 
@@ -64,8 +64,8 @@ void tmag::set_spvs()
 }
 
 
-BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< double >( system_in->size ){
-  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->size) || (j_in > system_in->size) ){
+BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< double >( system_in->get_size() ){
+  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
     _ERROR_("indexes outside the chain");
   }
   _system = system_in;
@@ -115,8 +115,8 @@ void BiAj::set_spvs()
 }
 
 
-AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->size ){
-  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->size) || (j_in > system_in->size) ){
+AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
+  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
     _ERROR_("indexes outside the chain");
   }
   _system = system_in;
@@ -166,8 +166,8 @@ void AiAj::set_gsv()
 }
 
 
-BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->size ){
-  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->size) || (j_in > system_in->size) ){
+BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
+  if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
     _ERROR_("indexes outside the chain");
   }
   _system = system_in;
@@ -214,9 +214,9 @@ void BiBj::set_gsv()
     _gsv=0.0;
 }
 
-rho::rho( int i,int r, ising1D * system) : obs<double>( system->size)
+rho::rho( int i,int r, ising1D * system) : obs<double>( system->get_size())
 {
-  if ((i+r > system->size) || (i < 0)){
+  if ((i+r > system->get_size()) || (i < 0)){
     _ERROR_("indexes outside the chain");
   }
   _system = system;
@@ -411,6 +411,10 @@ void ising1D::init()
 #endif
 }
 
+int ising1D::get_size()
+{
+  return size;
+}
 
 void ising1D::solve_diagonalization()
 {
@@ -436,7 +440,7 @@ void ising1D::solve_diagonalization()
   for (int irow=0;irow<size;++irow)
     for (int icol=0;icol<size;++icol){
       (*VV)(irow,icol) = temph(icol,irow);
-      /* attention: the order of eigenvectors is inverted for e>0
+      /* attention: the order of eigenvectors are inverted for e>0
 	 respect to our notation */
       (*UU)(irow,icol) = temph(icol,irow+size);
     }
@@ -451,6 +455,12 @@ void ising1D::solve_diagonalization()
     }
   (temph.transpose() * *_hamiltonian * temph).print();
   */
+
+  /* uncomment to check the definition of U and V
+  (UU->transpose() * *UU + VV->transpose()* *VV).print();
+  (VV->transpose() * *UU + UU->transpose()* *VV).print();
+  */
+
 
   delete [] eigenval;
   delete [] tempeigenval;

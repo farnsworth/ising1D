@@ -8,7 +8,7 @@
 #include <string>
 using namespace std;
 
-#define TAB "\t"
+#define TAB " "
 
 class out_file;
 
