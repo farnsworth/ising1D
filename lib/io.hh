@@ -44,7 +44,7 @@ private:
 template <class T>
 void out_file::write_parameter( const string name, const T val )
 {
-  *file << name << TAB << val << endl;
+  *file << name << SEP << val << endl;
 }
 
 template<class T>
