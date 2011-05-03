@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 
   if (argc > 1){
     int maxdist;
+    int fSite = -1;
     double t;
     string name,data,fileout="file.out";
 
@@ -27,6 +28,8 @@ int main(int argc, char *argv[])
     while ( ifile.read_data(name,data)>0){
       if (name=="time")
 	istringstream(data) >> t;
+      else if (name=="istart")
+	istringstream(data) >> fSite;
       else if (name=="fileout")
 	fileout = data;
     }
@@ -40,13 +43,18 @@ int main(int argc, char *argv[])
     maxdist = dist_loop.get_max_val();
 
     quench gigi( &ifile );
+
     gigi.set_gge_occupations();
 
     tmag tmag1(gigi.system);
     tmag1.set_spvs();
     double mgge = tmag1.get_ensemble_average( gigi.gge )/double(gigi.get_size());
 
-    int fSite= gigi.get_size()/2;
+
+    if (fSite<0)
+      fSite= gigi.get_size()/2;
+    else
+      cout << "you have had manual istart: " << fSite << endl;
     rho rho1( fSite, maxdist, gigi.system );
     
     rho1.set_ensemble_average( gigi.gge );
