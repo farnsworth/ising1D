@@ -44,11 +44,11 @@ double local_obs<T>::get_spv(int num)
 
 
 template<class T>
-double local_obs<T>::get_from_state(bool* state)
+double local_obs<T>::get_from_state(state* s)
 {
   double result=0.0;
   for (int i=0; i<this->_size; ++i)
-    if (state[i])
+    if (s->conf[i])
       result += 2.0*_spvs[i];
   return this->_gsv + result;
 }

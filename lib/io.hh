@@ -40,6 +40,7 @@ private:
   ofstream * file;
 };
 
+out_file& operator<<(out_file& , ostream& (*pf)(ostream&));
 
 template <class T>
 void out_file::write_parameter( const string name, const T val )

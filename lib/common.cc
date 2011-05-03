@@ -63,7 +63,7 @@ void state::next()
   
   do {
     if (i==size){
-      _WARNING_("you are generating too many states");
+      _ERROR_("You are producing too big state");
       break;
     }
     if (conf[i])
@@ -75,6 +75,15 @@ void state::next()
     ++i;
   } while (rest != 0);
 }
+
+
+bool state::islast()
+{ 
+  for (int i=0;i<size;++i)
+    if (not conf[i]) return false;
+  return true;
+}
+
 
 void state::from_int(unsigned int num)
 {
@@ -89,6 +98,18 @@ void state::from_int(unsigned int num)
     num = (num - num%2)/2;
     ++i;
   }
+}
+
+void operator++( state& s)
+{
+  s.next();
+}
+
+ostream& operator<<(ostream& out, const state &s)
+{
+  for (int i=0;i<s.size;++i)
+    out << s.conf[i];
+  return out;
 }
 
 template<>

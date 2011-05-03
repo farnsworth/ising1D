@@ -19,9 +19,14 @@ public:
   void print();
   void from_int( unsigned int );
   void flip(int);
+  bool islast();
+  friend ostream& operator<<( ostream& , const state &s );
 private:
   int size;
 };
+
+ostream& operator<<( ostream& , const state &s );
+void operator++(state&);
 
 template<class T>
 class obs{
@@ -41,7 +46,7 @@ public:
   local_obs( int );
   local_obs( double*, int );
   ~local_obs();
-  double get_from_state(bool* state);
+  double get_from_state(state*);
   double get_ensemble_average(double* nk);
   void set_gsv();
   virtual T get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt )=0;

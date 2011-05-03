@@ -43,7 +43,7 @@ double* ising1D_o::get_kpoints()
   
   result[0] = (symmetry) ? delta/ 2.0 : -M_PI + delta/ 2.0;
 
-  for (int i=1; i< this->nquantum; i+=1)
+  for (int i=0; i< this->nquantum; i+=1)
     result[i] = result[i-1] + delta;
 
   return result;

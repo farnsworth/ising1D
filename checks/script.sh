@@ -1,7 +1,29 @@
 #!/bin/sh
 
+function dorun {
+    ./check${1}.out file.in
+    OUT=$?
+    if [ $OUT = 0 ]; then
+	echo "check "${1}" ...... OK"
+    else
+	echo "check "${1}" not passed, error " $OUT
+	exit
+    fi
+}
+
+
+
+
+
 rm -rf *.in
 
+echo "CHECK 1: checks on static properties of U and V"
+echo "CHECK 2: checks on properties of U(t) and V(t)"
+echo "CHECK 3: checks of GGE occupations and gamma evolution (that should be constant)"
+echo "CHECK 4: normalization of \sum_\alpha c_\alpha^2"
+echo " "
+echo "PBC"
+
 cat > file.in << EOF
 [system0]
 size 10
@@ -19,20 +41,13 @@ epsilon 0.1
 pbc 1
 EOF
 
-./check1.out file.in 
-#> /dev/null 
-#2>&1
+dorun 1
+dorun 2
+dorun 3
+dorun 4
 
-OUT=$?
-
-if [ $OUT = 0 ]; then
-    echo "check 1 (PBC) passed"
-else
-    echo "check 1 (PBC) not passed, error " $OUT
-    exit
-fi
-
-
+echo " "
+echo "OBC"
 cat > file.in << EOF
 [system0]
 size 10
@@ -50,14 +65,7 @@ epsilon 0.1
 pbc 0
 EOF
 
-./check1.out file.in 
-#> /dev/null 
-#2>&1
-OUT=$?
-
-if [ $OUT = 0 ]; then
-    echo "check 1 (OBC) passed"
-else
-    echo "check 1 (OBC) not passed, error " $OUT
-    exit
-fi
+dorun 1
+dorun 2
+dorun 3
+dorun 4

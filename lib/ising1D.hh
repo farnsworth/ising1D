@@ -130,6 +130,7 @@ public:
   void read( in_file *, const string);
   int get_size();
   friend class quench;
+  energy* e;
 
 private:
   void init();
@@ -145,7 +146,6 @@ private:
   double *_JJ;
   // matrix that represent the Hamiltonian
   matrix<double> *_hamiltonian;
-  energy* e;
   // length of the chain
   int size;
 };
@@ -162,14 +162,14 @@ public:
   void set_time_evolution( const double );
   void set_gge_occupations( );
   int get_size();
+  double get_calpha2( state* );
 
   ising1D * system0;
   ising1D * system;
-protected:
+private:
   int size;
   void init();
   matrix< complex<double> > get_evolution_matrix(const double );
 };
-
 
 #endif

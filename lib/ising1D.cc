@@ -38,7 +38,8 @@ double tmag::_get_time_evolution( matrix< complex<double> > *UUt, matrix< comple
   
   for (int irow=0;irow<size;++irow)
     for (int icol=0;icol<size;++icol)
-      temp += pow(abs( (*VVt)(irow,icol) ),2);
+      //      temp += pow( abs( (*VVt)(irow,icol) ),2);
+      temp += norm( (*VVt)(irow,icol) );
   
   return 2.0*temp-double(size);
 }
@@ -57,7 +58,7 @@ void tmag::set_spvs()
   for (int mu=0;mu<_size;++mu){
     _spvs[mu] = 0.0;
     for (int irow=0;irow<_size;++irow)
-      _spvs[mu] += pow( (*_system->VV)(irow,mu),2);
+      _spvs[mu] += (*_system->VV)(irow,mu)*(*_system->VV)(irow,mu);
     _spvs[mu] = 1.0-2.0*_spvs[mu];
   }
   set_gsv();
@@ -430,9 +431,10 @@ void ising1D::solve_diagonalization()
   for (int i=0;i<size;++i){
     eigenval[i] = tempeigenval[2*size-i-1];
     
-    /* uncomment to print the eigenvalues
-      cout << eigenval[i] << endl;
-    */
+    // uncomment to print the eigenvalues
+    //cout << tempeigenval[i] << endl;
+    //cout << eigenval[i] << endl;
+    //
   }
 
   e = new energy(eigenval, size);
@@ -731,4 +733,26 @@ matrix< complex<double> > quench::get_evolution_matrix( const double time )
   _ERROR_TRACKING_;
 #endif
   return temp;
+}
+
+double quench::get_calpha2( state* s)
+{
+  matrix<double> u1(size,size),v1(size,size),temp(size,size);
+ 
+  for (int icol=0;icol<size;++icol){
+    if (s->conf[icol]){
+      for (int irow=0;irow<size;++irow){
+	u1(irow,icol) = (*system->VV)(irow,icol);
+	v1(irow,icol) = (*system->UU)(irow,icol);
+      }}
+    else
+      for (int irow=0;irow<size;++irow){
+	u1(irow,icol) = (*system->UU)(irow,icol);
+	v1(irow,icol) = (*system->VV)(irow,icol);
+      }
+  }
+
+  temp = system0->UU->daga() * u1 + system0->VV->daga() * v1;
+      
+  return abs(temp.det());
 }
