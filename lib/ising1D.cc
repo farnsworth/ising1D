@@ -23,12 +23,45 @@ double energy::get_time_evolution( matrix< complex<double> > *UUt, matrix< compl
   return 0.0;
 }
 
+localtmag::localtmag(int site, ising1D * system_in) : local_obs<double>( system_in->get_size() ){
+  _system = system_in;
+  _site = site;
+}
+
+
+double localtmag::_get_time_evolution(int site, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+{
+  int size = UUt->get_ncol();
+  double temp = 0.0;
+  
+  for (int icol=0;icol<size;++icol)
+    temp += norm( (*VVt)(site,icol) );
+  
+  return 2.0*temp-1.0;
+}
+
+
+double localtmag::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+{
+  return _get_time_evolution( _site, UUt, VVt );
+}
+
+
+void localtmag::set_spvs()
+{
+  _spvs = new double[_size];
+  
+  _gsv = -1.0;
+  for (int mu=0;mu<_size;++mu){
+    _spvs[mu] = (*_system->UU)(_site,mu)*(*_system->UU)(_site,mu)-(*_system->VV)(_site,mu)*(*_system->VV)(_site,mu);
+    _gsv += 2.0*(*_system->VV)(_site,mu)*(*_system->VV)(_site,mu);
+  }
+}
 
 
 tmag::tmag(ising1D * system_in) : local_obs<double>( system_in->get_size() ){
   _system = system_in;
 }
-
 
 
 double tmag::_get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )

@@ -37,6 +37,7 @@ class energy : public local_obs<double>{
 public:
   energy( double *, int );
   double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+private:
 };
 
 
@@ -48,6 +49,18 @@ public:
   void set_spvs();
 private:
   ising1D * _system;
+};
+
+
+class localtmag : public local_obs<double>{
+public:
+  localtmag( int, ising1D * );
+  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  static double _get_time_evolution( int,matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  void set_spvs();
+private:
+  ising1D * _system;
+  int _site;
 };
 
 
