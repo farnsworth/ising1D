@@ -73,24 +73,6 @@ private:
   T initval;
 };
 
-template<>
-extern double loop<double>::get_val();
-
-template<>
-extern int loop<int>::get_val();
-
-template<>
-extern float loop<float>::get_val();
-
-template<>
-extern double loop<double>::get_max_val();
-
-template<>
-extern int loop<int>::get_max_val();
-
-template<>
-extern float loop<float>::get_max_val();
-
 
 #include "common.hpp"
 #endif
