@@ -170,7 +170,7 @@ complex<double> AiAj::_get_time_evolution( int i, int j, matrix< complex<double>
   int size = UUt->get_ncol();
   complex<double> temp,temp1,temp2;
   
-  temp = (0.0,0.0);
+  temp = complex<double>(0.0,0.0);
 
   for (int imu=0;imu<size;++imu){
     temp1 = (*VVt)(i,imu) + (*UUt)(i,imu);
@@ -221,7 +221,7 @@ complex<double> BiBj::_get_time_evolution( int i, int j, matrix< complex<double>
   int size = UUt->get_ncol();
   complex<double> temp,temp1,temp2;
   
-  temp = (0.0,0.0);
+  temp = complex<double>(0.0,0.0);
 
   for (int imu=0;imu<size;++imu){
     temp1 = (*VVt)(i,imu) - (*UUt)(i,imu);
@@ -311,7 +311,7 @@ void rho::set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<do
   int i,j;
   _full_matrix = new matrix<complex<double> >(2*_r,2*_r);
   
-  *_full_matrix = (0.0,0.0);
+  *_full_matrix = complex<double>(0.0,0.0);
   for (int irow=0;irow<2*_r;++irow){
 
     if (irow%2 == 0)

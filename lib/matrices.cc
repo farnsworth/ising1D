@@ -35,7 +35,7 @@ complex<double> matrix< complex<double> >::det( )
 {
   if (nrow != ncol){
     _ERROR_("you are trying to compute the determiant of a non square matrix");
-    return (0.0,0.0);
+    return complex<double>(0.0,0.0);
   }
 
   int lda = ncol;

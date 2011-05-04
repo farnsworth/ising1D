@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
   if (argc > 1){
     double eps=1.0e-12;
-    double err=0.0,dtemp,dtemp2;
+    double err=0.0,dtemp;
     string filename = argv[1];
 
     in_file ifile(filename);
