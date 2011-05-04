@@ -26,6 +26,27 @@ echo "PBC"
 
 cat > file.in << EOF
 [system0]
+size 100
+h 0.9
+J 1
+gamma  1
+epsilon  0.1
+pbc 1
+[system]
+size 100
+h   0.5
+J   1
+gamma  1
+epsilon 0.1
+pbc 1
+EOF
+
+dorun 1
+dorun 2
+dorun 3
+
+cat > file.in << EOF
+[system0]
 size 10
 h 0.9
 J 1
@@ -41,13 +62,31 @@ epsilon 0.1
 pbc 1
 EOF
 
-dorun 1
-dorun 2
-dorun 3
 dorun 4
 
 echo " "
 echo "OBC"
+cat > file.in << EOF
+[system0]
+size 50
+h 0.9
+J 1
+gamma  1
+epsilon  0.0
+pbc 0
+[system]
+size 50
+h   0.5
+J   1
+gamma  1
+epsilon 0.0
+pbc 0
+EOF
+
+dorun 1
+dorun 2
+dorun 3
+
 cat > file.in << EOF
 [system0]
 size 10
@@ -65,7 +104,4 @@ epsilon 0.1
 pbc 0
 EOF
 
-dorun 1
-dorun 2
-dorun 3
 dorun 4

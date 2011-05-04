@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 {
 
   if (argc > 1){
-    double eps=1.0e-12;
+    double eps=1.0e-10;
     double err=0.0;
     double dtemp;
     string filename = argv[1];
@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
       for (int j=0;j<size;++j){
 	dtemp = abs(temp(i,j));
 	if (dtemp > eps){
-	  temp.print();
+	  cout << "i =" << i << "   j = " << j << " val = " << dtemp << endl;
+	  //temp.print();
 	  exit(2);
 	}
 	if ( dtemp > err)
