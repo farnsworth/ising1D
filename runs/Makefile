@@ -24,10 +24,12 @@ MACHINE := $(shell uname -m)
 
 ifeq ($(UNAME), Linux)
    ifeq ($(MACHINE),x86_64)
-      LIB=-lmkl_solver_lp64 -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread
+	LIB=-llapack
+#      LIB=-lmkl_solver_lp64 -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread
    endif
    ifeq ($(MACHINE),i686)
-      LIB=-lmkl_solver -Wl,--start-group -lmkl_intel -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread
+	LIB=-llapack
+#      LIB=-lmkl_solver -Wl,--start-group -lmkl_intel -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread
 #   LIB=-lmkl_core -lmkl_lapack -lmkl_solver -lmkl_def -lmkl_intel -lmkl_intel_thread -liomp5 -lpthread
    endif
 endif
