@@ -72,10 +72,8 @@ int main(int argc, char *argv[])
       }
     cout << "max error " << err << endl;
   }
-  else{
-    _ERROR_("no file name given");
-    return -1;
-  }
+  else
+    _ERROR_("no file name given",-1);
   
   exit(0);
 }

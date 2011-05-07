@@ -43,7 +43,6 @@ default: $(MFO) $(ISING1DLIB)
 	@echo $(MF)
 	$(COMMAND)
 
-
 fast: FLAGS += -O3
 fast: $(MFO) $(ISING1DLIB)
 	$(COMMAND)

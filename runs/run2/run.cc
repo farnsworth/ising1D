@@ -12,9 +12,6 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-
-
-
   if (argc > 1){
     int maxdist;
     int fSite = -1;
@@ -79,10 +76,8 @@ int main(int argc, char *argv[])
       dist_loop.restart();
     }
   }
-  else{
-    _ERROR_("no file name given");
-    return -1;
-  }
+  else
+    _ERROR_("no file name given",1);
   
   _ERROR_TRACKING_(-1);
 }

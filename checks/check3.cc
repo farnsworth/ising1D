@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
 
   if (argc > 1){
-    double eps=1.0e-12;
+    double eps=1.0e-5;
     double err=0.0,dtemp;
     string filename = argv[1];
 
@@ -49,10 +49,8 @@ int main(int argc, char *argv[])
     }
     cout << "max error " << err << endl; 
   }
-  else{
-    _ERROR_("no file name given");
-    return -1;
-  }
+  else
+    _ERROR_("no file name given",-1);
   
   exit(0);
 }

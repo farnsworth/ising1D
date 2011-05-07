@@ -4,6 +4,7 @@ FILESOUT=$(FILES:.cc=.o)
 
 DIR=$(shell pwd)/..
 
+#FLAGS=-Wall -pedantic
 
 ifneq ($(strip $(shell which g++)),)
 	COMPILER=g++

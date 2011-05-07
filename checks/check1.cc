@@ -32,13 +32,13 @@ int main(int argc, char *argv[])
     matrix<double> temp(size,size);
 
 
-    temp = gigi.UU->daga() * *gigi.UU + \
+    temp = gigi.UU->daga() * *gigi.UU +		\
       gigi.VV->daga() * *gigi.VV;
     for (int i=0;i<size;++i)
       for (int j=0;j<size;++j){
 	dtemp = abs( temp(i,j) -delta(i,j) );
 	if ( dtemp > eps){
-	  temp.print();
+	  cout << "i =" << i << "   j = " << j << " val = " << dtemp << endl;
 	  exit(1);
 	}
 	if ( dtemp > err)
@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
 	dtemp = abs(temp(i,j));
 	if (dtemp > eps){
 	  cout << "i =" << i << "   j = " << j << " val = " << dtemp << endl;
-	  //temp.print();
 	  exit(2);
 	}
 	if ( dtemp > err)
@@ -65,7 +64,7 @@ int main(int argc, char *argv[])
       for (int j=0;j<size;++j){
 	dtemp = abs(abs(temp(i,j)));
 	if (dtemp > eps){
-	  temp.print();
+	  cout << "i =" << i << "   j = " << j << " val = " << dtemp << endl;
 	  exit(3);
 	}
 	if ( dtemp > err)
@@ -74,11 +73,8 @@ int main(int argc, char *argv[])
     cout << "max error " << err << endl;
   }
   else{
-    _ERROR_("no file name given");
-    return -1;
+    _ERROR_("no file name given",-1);
   }
-  
+
   exit(0);
-  
-  _ERROR_TRACKING_(-1);
 }
