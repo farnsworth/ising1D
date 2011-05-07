@@ -16,7 +16,9 @@ HEADERS_CODE = $(shell ls *.hpp)
 
 INCLUDEDIR=-I../external/
 #FLAGS=-framework veclib
-FLAGS =-O3
+FLAGS =-O3 -DUSUAL_ALG
+#-DDK_ALG
+#-Wall -pedantic
 
 default: $(HEADERS) $(HEADERS_CODE) $(OBJECTS)
 

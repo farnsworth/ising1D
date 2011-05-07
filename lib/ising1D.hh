@@ -149,6 +149,7 @@ private:
   void init();
   matrix<double>  get_hamiltonian();
   void solve_diagonalization();
+  void check( double* eigenval, matrix<double> * eigvect );
   matrix<double>  get_matrix_A();
   matrix<double>  get_matrix_B();
   int _seed;

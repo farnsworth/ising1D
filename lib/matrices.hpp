@@ -10,10 +10,8 @@ matrix<T>::matrix( int nrow_in, int ncol_in )
 template <class T>
 int matrix<T>::index( const int irow, const int icol ) const
 {
-  if ((irow>=nrow)||(icol>=ncol)){
-    _ERROR_("matrices index are outside of range");
-    return 0;
-  }
+  if ((irow>=nrow)||(icol>=ncol))
+    _ERROR_("matrices index are outside of range",0);
   return irow*ncol+icol;
 }
 
@@ -50,8 +48,6 @@ matrix<T> matrix<T>::transpose()
   
   for (int i=0;i<nrow;++i)
     for (int j=0;j<ncol;++j){
-      //      cout << "i" << i << "   j"<< j;
-      // cout << "  " << (*this)(i,j) << endl;
       result(j,i) = (*this)(i,j);
     }
   return result;
@@ -95,10 +91,8 @@ matrix<T>& matrix<T>::operator=( const matrix<T> &source)
     _WARNING_("you are assigning a matrix to itself");
     return *this;
   }
-  if ( (nrow != source.nrow)||(ncol != source.ncol)){
-    _ERROR_("you are assigning two matrix with different size");
-    return *this;
-  }
+  if ( (nrow != source.nrow)||(ncol != source.ncol))
+    _ERROR_("you are assigning two matrix with different size",*this);
 
   for (int i=0;i<nrow*ncol;++i)
     this->pointer[i] = source.pointer[i];
@@ -113,8 +107,7 @@ matrix<T> operator+(const matrix<T> &c1, const matrix<T> &c2)
   matrix<T> result(c1.nrow,c1.ncol);
 
   if ( (c1.nrow != c2.nrow)||(c1.ncol != c2.ncol)){
-    _ERROR_("you are summing two matrices with different size");
-    return result;
+    _ERROR_("you are summing two matrices with different size",result);
   }
 
   for (int i=0;i<c1.nrow*c1.ncol;++i)
@@ -129,10 +122,8 @@ matrix<T> operator-(const matrix<T> &c1, const matrix<T> &c2)
 {
   matrix<T> result(c1.nrow,c1.ncol);
   
-  if ( (c1.nrow != c2.nrow)||(c1.ncol != c2.ncol)){
-    _ERROR_("you are summing two matrices with different size");
-    return result;
-  }
+  if ( (c1.nrow != c2.nrow)||(c1.ncol != c2.ncol))
+    _ERROR_("you are summing two matrices with different size",result);
 
   for (int i=0;i<c1.nrow*c1.ncol;++i)
     result.pointer[i] = c1.pointer[i] - c2.pointer[i];
@@ -146,10 +137,8 @@ matrix<T> operator*(const matrix<T> &c1,const matrix<T> &c2)
 {
   matrix<T> result(c1.nrow,c2.ncol);
   
-  if (c1.ncol != c2.nrow){
-    _ERROR_("you are multipling  two incompatible matrices");
-    return result;
-  }
+  if (c1.ncol != c2.nrow)
+    _ERROR_("you are multipling  two incompatible matrices",result);
   
   result = 0.0;
   
@@ -192,10 +181,8 @@ matrix< complex<T> > operator*(const matrix< complex<T> > &c1, const matrix<T> &
 {
   matrix< complex<T> > result(c1.nrow,c2.ncol);
 
-  if (c1.ncol != c2.nrow){
-    _ERROR_("you are multipling  two incompatible matrices");
-    return result;
-  }
+  if (c1.ncol != c2.nrow)
+    _ERROR_("you are multipling  two incompatible matrices",result);
   
   result = complex<T>(0.0,0.0);
   
@@ -212,10 +199,8 @@ matrix< complex<T> > operator*( const matrix<T> &c1, const matrix< complex<T> > 
 {
   matrix< complex<T> > result(c1.nrow,c2.ncol);
 
-  if (c1.ncol != c2.nrow){
-    _ERROR_("you are multipling  two incompatible matrices");
-    return result;
-  }
+  if (c1.ncol != c2.nrow)
+    _ERROR_("you are multipling  two incompatible matrices",result);
   
   result = complex<T>(0.0,0.0);
   
@@ -242,14 +227,13 @@ void matrix<T>::print()
 template <class T>
 T* matrix<T>::diagonalize( bool evect)
 {
-  _ERROR_("diagonalization is not yet implemented for this kind of matrices");
-  return NULL;
+  _ERROR_("diagonalization is not yet implemented for this kind of matrices",NULL);
 }
 
 template <class T>
 T matrix<T>::det()
 {
-  _ERROR_("determinant is not yet implemented for this kind of matrices");
+  _ERROR_("determinant is not yet implemented for this kind of matrices",);
 }
 
 template<>

@@ -51,7 +51,7 @@ void state::random()
 void state::flip( int n)
 {
   if ((n>=size) || (n<0))
-    _ERROR_("you are flipping a site outside the chain");
+    _ERROR_("you are flipping a site outside the chain",);
   else
     conf[n] = !conf[n];
 }
@@ -63,7 +63,7 @@ void state::next()
   
   do {
     if (i==size){
-      _ERROR_("You are producing too big state");
+      _WARNING_("You are producing too big state");
       break;
     }
     if (conf[i])

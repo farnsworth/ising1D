@@ -100,7 +100,7 @@ void tmag::set_spvs()
 
 BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< double >( system_in->get_size() ){
   if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
-    _ERROR_("indexes outside the chain");
+    _ERROR_("indexes outside the chain",);
   }
   _system = system_in;
   _i = i_in;
@@ -151,7 +151,7 @@ void BiAj::set_spvs()
 
 AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
   if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
-    _ERROR_("indexes outside the chain");
+    _ERROR_("indexes outside the chain",);
   }
   _system = system_in;
   _i = i_in;
@@ -202,7 +202,7 @@ void AiAj::set_gsv()
 
 BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
   if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
-    _ERROR_("indexes outside the chain");
+    _ERROR_("indexes outside the chain",);
   }
   _system = system_in;
   _i = i_in;
@@ -251,7 +251,7 @@ void BiBj::set_gsv()
 rho::rho( int i,int r, ising1D * system) : obs<double>( system->get_size())
 {
   if ((i+r > system->get_size()) || (i < 0)){
-    _ERROR_("indexes outside the chain");
+    _ERROR_("indexes outside the chain",);
   }
   _system = system;
   _r = r;
@@ -288,7 +288,7 @@ void rho::set_ensemble_average(double* nk)
 double rho::get_ensemble_average(int l)
 {
   if (l<0) l=_r;
-  if (l>_r) _ERROR_("distance greater than the initialized one");
+  if (l>_r) _ERROR_("distance greater than the initialized one",0.0);
  
   matrix<double> temp(l,l);
   double result;
@@ -348,7 +348,7 @@ void rho::set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<do
 double rho::get_time_evolution(int l)
 {
   if (l<0) l=_r;
-  if (l>_r) _ERROR_("distance greater than the initialized one");
+  if (l>_r) _ERROR_("distance greater than the initialized one",0.0);
  
   matrix< complex<double> > temp(2*l,2*l);
   complex<double> tResult;
@@ -414,7 +414,7 @@ ising1D::ising1D(int size_in, double h, double J, double epsilon, double gamma, 
 void ising1D::init()
 {
   if (size<1)
-    _ERROR_("Non valid value of size");
+    _ERROR_("Non valid value of size",);
 
   if (size%2 == 1)
     _WARNING_("Odd number of sites");
@@ -438,8 +438,10 @@ void ising1D::init()
     _hh[i] = _h + 2.0*_epsilon*(drand1()-0.5);
     _JJ[i] = _J + 2.0*_epsilon*(drand1()-0.5);
   }
+
   (*_hamiltonian) = get_hamiltonian();
   solve_diagonalization();
+
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
@@ -450,52 +452,35 @@ int ising1D::get_size()
   return size;
 }
 
+
 void ising1D::solve_diagonalization()
 {
   double * tempeigenval = new double[2*size];
   double * eigenval = new double[size];
-
   matrix<double> temph(2*size,2*size);
 
   temph = get_hamiltonian();
 
   tempeigenval = temph.diagonalize(true);
+  if (not _pbc)
+    check( tempeigenval, &temph );
+#ifdef DEBUG
+  _ERROR_TRACKING_;
+#endif
 
   for (int i=0;i<size;++i){
-    eigenval[i] = tempeigenval[2*size-i-1];
-    
+    eigenval[i] = tempeigenval[size+i];
     // uncomment to print the eigenvalues
-    //cout << tempeigenval[i] << endl;
     //cout << eigenval[i] << endl;
-    //
   }
 
   e = new energy(eigenval, size);
 
   for (int irow=0;irow<size;++irow)
     for (int icol=0;icol<size;++icol){
-      (*VV)(irow,icol) = temph(icol,irow);
-      /* attention: the order of eigenvectors are inverted for e>0
-	 respect to our notation */
-      (*UU)(irow,icol) = temph(icol,irow+size);
+      (*VV)(irow,icol) = temph(size+icol,size+irow);
+      (*UU)(irow,icol) = temph(size+icol,irow);
     }
-
-  /* uncomment to check the definition of U and V  
-  for (int irow=0;irow<size;++irow)
-    for (int icol=0;icol<size;++icol){
-      temph(irow,icol) = (*UU)(irow,icol) ;
-      temph(irow+size,icol+size) = (*UU)(irow,icol);
-      temph(irow+size,icol) = (*VV)(irow,icol) ;
-      temph(irow,icol+size) = (*VV)(irow,icol);
-    }
-  (temph.transpose() * *_hamiltonian * temph).print();
-  */
-
-  /* uncomment to check the definition of U and V
-  (UU->transpose() * *UU + VV->transpose()* *VV).print();
-  (VV->transpose() * *UU + UU->transpose()* *VV).print();
-  */
-
 
   delete [] eigenval;
   delete [] tempeigenval;
@@ -504,6 +489,80 @@ void ising1D::solve_diagonalization()
   _ERROR_TRACKING_;
 #endif
   return;
+}
+
+void ising1D::check( double* eigenval,  matrix<double> * eigvect )
+{
+  bool docor = false;
+  int size = eigvect->get_ncol()/2;
+  double temp;
+
+  for (int irow=0;irow<size;++irow)
+    for (int icol=0;icol<size;++icol){
+      temp = abs(abs( (*eigvect)(irow,icol)) - abs( (*eigvect)(2*size-1-irow,icol+size)) );
+      if ( temp > 1.0e-10){
+	if (irow == size-1)
+	  docor = true;
+	else
+	  {
+	    cout << "discrepancy " << temp << " val" << abs( (*eigvect)(irow,icol)) << endl;
+	    _ERROR_("some error in the diagonalization",);
+	  }
+      }
+      temp = abs( abs( (*eigvect)(size +irow,icol) ) - abs( (*eigvect)(size-irow-1, icol+size ))); 
+      if ( temp >1.0e-10){
+	if (irow == 0)
+	  docor = true;
+	else
+	  {
+	    cout << "discrepancy " << temp << " val" << abs( (*eigvect)(irow,icol)) << endl;
+	    _ERROR_("some error in the diagonalization",);
+	  }
+      }
+    }
+    
+  if (docor){
+    _WARNING_("manual correction of eigenvectors");
+    double gamma = ( (*eigvect)(size-1,size) + (*eigvect)(size,0) ) / ( (*eigvect)(size,size) - (*eigvect)(size-1,0) );
+    double beta = 1.0/sqrt(1.0+gamma*gamma);
+    double alpha = gamma*beta;
+    double temp1,temp2;
+    for (int i=0;i<2*size;++i){
+      temp1 = (*eigvect)(size-1,i);
+      temp2 = (*eigvect)(size,i);
+      (*eigvect)(size,i) = alpha*temp1 + beta*temp2;
+      (*eigvect)(size-1,i) = -beta*temp1 + alpha*temp2;
+    }
+
+    // calculation of the eigenvalue associated to the eigenvectors size-1 and size
+    temp1 = 0.0;
+    temp2 = 0.0;
+    for (int j=0;j<2*size;++j){
+      double t1=0.0,t2=0.0;
+      for (int i=0;i<2*size;++i){
+	t1 += (*_hamiltonian)(j,i) * (*eigvect)(size-1,i);
+	t2 += (*_hamiltonian)(j,i) * (*eigvect)(size,i);
+      }
+      temp1 += t1*(*eigvect)(size-1,j);
+      temp2 += t1*(*eigvect)(size,j);
+    }
+
+    double temp;
+    if ( temp1>0 ){
+      // inversion of the eigenvectors
+      eigenval[size-1] = temp2;
+      eigenval[size] = temp1;
+      for (int i=0;i<2*size;++i){
+	temp = (*eigvect)(size,i);
+	(*eigvect)(size,i) = (*eigvect)(size-1,i);
+	(*eigvect)(size-1,i) = temp;
+      }
+    }
+    else{
+      eigenval[size-1] = temp1;
+      eigenval[size] = temp2; 
+    }
+  }
 }
 
 
@@ -629,7 +688,7 @@ void ising1D::read( in_file* file,const string systemname)
   string name, data;
 
   if (file->find_tag(systemname)<0){
-    _ERROR_("not able to find tag");
+    _ERROR_("not able to find tag",);
   }
 #ifdef DEBUG
   _ERROR_TRACKING_;

@@ -2,7 +2,11 @@
 
 #define __ERROR_hh__
 
-#define _ERROR_(a) error(__FILE__,__FUNCTION__,__LINE__,a)
+//define _ERROR_(a) error(__FILE__,__FUNCTION__,__LINE__,a)
+#define _ERROR_(a,val) do {				\
+    error(__FILE__,__FUNCTION__,__LINE__,a);		\
+    return val;						\
+  } while(0)
 #define _WARNING_(a) warning(__FILE__,__FUNCTION__,__LINE__,a)
 #define _ERROR_TRACKING_(a) do {			\
     if (ierr > 0){					\

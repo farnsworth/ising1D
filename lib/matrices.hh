@@ -10,6 +10,7 @@
 using namespace std;
 
 extern "C" void dsyev_(char *, char *, int *, double *, int *, double *, double *, int *, int * );
+extern "C" void dsyevd_(char *, char *, int *, double *, int *, double *, double *, int *, int*, int*, int*);
 extern "C" void dgetrf_(int *,int *, double *, int *, int *, int * );
 extern "C" void zgetrf_(int *,int *, complex<double> *, int *, int *, int * );
 
