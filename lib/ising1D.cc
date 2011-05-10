@@ -435,9 +435,13 @@ void ising1D::init()
   _hh = new double[size];
   
   for (int i=0;i<size;++i){
-    _hh[i] = _h + 2.0*_epsilon*(drand1()-0.5);
-    _JJ[i] = _J + 2.0*_epsilon*(drand1()-0.5);
+    _hh[i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+    _JJ[i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
   }
+
+  //  for (int i=0;i<10;++i){
+  //  cout << _hh[i] << "\t" << _JJ[i] << endl; 
+  //}  
 
   (*_hamiltonian) = get_hamiltonian();
   solve_diagonalization();
@@ -544,7 +548,7 @@ void ising1D::check( double* eigenval,  matrix<double> * eigvect )
 	t2 += (*_hamiltonian)(j,i) * (*eigvect)(size,i);
       }
       temp1 += t1*(*eigvect)(size-1,j);
-      temp2 += t1*(*eigvect)(size,j);
+      temp2 += t2*(*eigvect)(size,j);
     }
 
     double temp;
