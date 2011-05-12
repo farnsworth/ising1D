@@ -59,6 +59,53 @@ void localtmag::set_spvs()
 }
 
 
+/********* to modify ************/
+cidagacj::cidagacj(int i, int j, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
+  _system = system_in;
+  _i = i;
+  _j = j;
+}
+
+
+complex<double> cidagacj::_get_time_evolution(int i,int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+{
+  int size = UUt->get_ncol();
+  complex<double> temp = 0.0;
+  
+  for (int icol=0;icol<size;++icol)
+    temp += (*VVt)(i,icol) * conj( (*VVt)(j,icol) );
+  
+  return temp;
+}
+
+
+complex<double> cidagacj::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+{
+  return _get_time_evolution( _i,_j, UUt, VVt );
+}
+
+
+void cidagacj::set_spvs()
+{
+  _spvs = new double[_size];
+  
+  _gsv = 0.0;
+  for (int mu=0;mu<_size;++mu){
+    _spvs[mu] = ((*_system->UU)(_i,mu)*(*_system->UU)(_j,mu)-(*_system->VV)(_i,mu)*(*_system->VV)(_j,mu))/2.0;
+    _gsv += (*_system->VV)(_i,mu)*(*_system->VV)(_j,mu);
+  }
+
+}
+/********************************/
+
+
+
+
+
+
+
+
+
 tmag::tmag(ising1D * system_in) : local_obs<double>( system_in->get_size() ){
   _system = system_in;
 }

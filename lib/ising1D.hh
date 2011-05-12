@@ -65,6 +65,18 @@ private:
 };
 
 
+class cidagacj : public local_obs< complex<double> >{
+public:
+  cidagacj( int i, int j, ising1D * );
+  complex<double> get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  static complex<double> _get_time_evolution( int i,int j,matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  void set_spvs();
+private:
+  ising1D * _system;
+  int _i;
+  int _j;
+};
+
 
 class AiAj : public local_obs< complex<double> >{
 public:

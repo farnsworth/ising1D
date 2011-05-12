@@ -1,0 +1,4 @@
+run 4:
+it does a calculation of \sigma^z_i (local transverse magnetization) 
+at the center of the chain an c_i^\dag c_j as a function of time
+and GGE averages

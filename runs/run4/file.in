@@ -1,0 +1,24 @@
+[parameters]
+fileout file100.out
+
+[time_loop]
+delta 0.1
+steps 2000
+
+[system0]
+size 100
+h 0.9
+J 1
+gamma 1
+epsilon 0.0
+pbc 1
+seed 32
+
+[system]
+size 100
+h 0.5
+J 1
+gamma 1
+epsilon 0.0
+pbc 1
+seed 54
