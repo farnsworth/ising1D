@@ -387,6 +387,7 @@ ising1D::ising1D( in_file* file, const string name)
   _epsilon = _EPSILON_;
   _pbc = _PBC_;
   _seed = _SEED_;
+  _from_center = _FROM_CENTER_;
   read( file, name );
   init();
 #ifdef DEBUG
@@ -420,7 +421,7 @@ void ising1D::init()
     _WARNING_("Odd number of sites");
 
   if (_pbc)
-    _WARNING_("You are using PBC");
+    _MESSAGE_("You are using PBC");
 
   _hamiltonian = new matrix<double>(2*size,2*size);
 
@@ -433,11 +434,21 @@ void ising1D::init()
   VV = new matrix<double>(size,size);
   _JJ = new double[size];
   _hh = new double[size];
-  
-  for (int i=0;i<size;++i){
-    _hh[i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-    _JJ[i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+
+  if (_from_center){
+    _MESSAGE_("Disorder is generated from the center of the chain");
+    for (int i=0;i<size/2;++i){
+      _hh[size/2 - i - 1] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      _hh[size/2 + i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      _JJ[size/2 - i - 1] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      _JJ[size/2 + i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+    }
   }
+  else
+    for (int i=0;i<size;++i){
+      _hh[i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      _JJ[i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+    }
 
   //  for (int i=0;i<10;++i){
   //  cout << _hh[i] << "\t" << _JJ[i] << endl; 
@@ -504,7 +515,7 @@ void ising1D::check( double* eigenval,  matrix<double> * eigvect )
   for (int irow=0;irow<size;++irow)
     for (int icol=0;icol<size;++icol){
       temp = abs(abs( (*eigvect)(irow,icol)) - abs( (*eigvect)(2*size-1-irow,icol+size)) );
-      if ( temp > 1.0e-10){
+      if ( temp > 1.0e-11){
 	if (irow == size-1)
 	  docor = true;
 	else
@@ -712,6 +723,8 @@ void ising1D::read( in_file* file,const string systemname)
       istringstream(data) >> _pbc;
     else if (name=="seed")
       istringstream(data) >> _seed;
+    else if (name=="from_center")
+      istringstream(data) >> _from_center;
   }
 #ifdef DEBUG
   _ERROR_TRACKING_;

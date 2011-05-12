@@ -25,6 +25,7 @@
 #define _EPSILON_ 0.0 /**< double value. Default disorder. */
 #define _PBC_ true /**< boolean value. Default periodic boundary conditions. */
 #define _SEED_ -1 /**< default seed value. */
+#define _FROM_CENTER_ false /**< boolean value. Starting point of generating disorder */
 
 
 class ising1D;
@@ -162,6 +163,7 @@ private:
   matrix<double> *_hamiltonian;
   // length of the chain
   int size;
+  bool _from_center; /**< generate disorder from the center of the chain or not */
 };
 
 
