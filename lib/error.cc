@@ -25,6 +25,12 @@ void warning(const char* file, const char* function, const int line,const char* 
   ierr = -1;
 }
 
+void message(const char* file, const char* function, const int line,const char* message)
+{
+  cout << "MESSAGE: " << message << endl;
+  cout << "function " << function << ", file " << file << ", line " << line << endl;
+}
+
 
 void error_tracking(const char* file, const char* function, const int line)
 {

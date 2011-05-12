@@ -14,13 +14,15 @@
       return a;						\
     }							\
   } while(0)
-
+#define _MESSAGE_(a) message(__FILE__,__FUNCTION__,__LINE__,a)
 
 extern int ierr;
 
 void error(const char* file,const char* function ,const int line,const char* message);
 
 void warning(const char* file,const char* function ,const int line,const char* message);
+
+void message(const char* file,const char* function ,const int line,const char* message);
 
 void error_tracking(const char* file,const char* function ,const int line);
 
