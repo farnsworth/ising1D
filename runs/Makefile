@@ -5,6 +5,8 @@ MF=run$(NRUN)/run.cc
 MFO=$(MF:.cc=.o)
 OUT=run$(NRUN)/out
 
+ALLRUNS=$(shell ls -d run*)
+
 DIR=$(shell pwd)/..
 
 ifneq ($(strip $(shell which g++)),)
@@ -49,6 +51,11 @@ fast: FLAGS += -O3
 fast: $(MFO) $(ISING1DLIB)
 	$(COMMAND)
 
+all: force_look
+	@for dir in $(ALLRUNS);do \
+	$(MAKE) -C$${dir} fast; \
+	done;
+
 clean:
 	@rm -f *.o out *~
 	@rm -f run*/*.o run*/*out run*/*~
@@ -57,6 +64,8 @@ clean:
 	echo $(DIR)
 	$(COMPILER) $(FLAGS) $(INCLUDEDIR) -c $< -o $*.o
 
+force_look:
+	@true
 
 #@for dir in $(DIRLIB);do \
 #$(MAKE) -C$${dir}; \
