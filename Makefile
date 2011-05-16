@@ -1,19 +1,30 @@
 
-DIRS=$(shell ls -d */)
+DIRLIB=external lib
 
+RUNS=runs
 
-#all:
-#	@for dir in $(DIRLIB);do \
-#	$(MAKE) -C$${dir}; \
-#	done;
+ALLDIR=$(DIRLIB) $(RUNS)
 
-#all-fast:
-#	@for dir in $(DIRLIB);do \
-#	$(MAKE) -C$${dir}; \
-#	done;
+#ALLDIR=$(shell ls -d */)
 
-clean-all:
+lib: force_look
+	@for dir in $(DIRLIB);do \
+	$(MAKE) -C$${dir}; \
+	done;
+
+runs: force_look
+	$(MAKE) -C$(RUNS) all
+
+all: force_look
+	$(MAKE) lib
+	$(MAKE) runs
+
+clean:
 	@rm -f *.o out *~
-	@for dir in $(DIRS);do \
+	@rm utilities/*~
+	@for dir in $(ALLDIR);do \
 	$(MAKE) -C$${dir} clean; \
 	done;
+
+force_look:
+	@true
