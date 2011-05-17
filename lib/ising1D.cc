@@ -504,9 +504,9 @@ void ising1D::init( double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
       _JJ[i] = (*JJgen)(i,this);
     }
 
-  for (int i=0;i<10;++i){
-    cout << _hh[i] << "\t" << _JJ[i] << endl; 
-  }  
+  //  for (int i=45;i<55;++i){
+  //  cout << _hh[i] << "\t" << _JJ[i] << endl; 
+  //}  
 
   (*_hamiltonian) = get_hamiltonian();
   solve_diagonalization();
