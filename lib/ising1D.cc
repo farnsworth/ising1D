@@ -425,7 +425,7 @@ rho::~rho()
 
 
 
-ising1D::ising1D( in_file* file, const string name)
+ising1D::ising1D( in_file* file, const string name, double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*) )
 {
   size = _SIZE_;
   _h = _H_;
@@ -436,7 +436,7 @@ ising1D::ising1D( in_file* file, const string name)
   _seed = _SEED_;
   _from_center = _FROM_CENTER_;
   read( file, name );
-  init();
+  init( (*JJgen), (*HHgen) );
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
@@ -452,14 +452,15 @@ ising1D::ising1D(int size_in, double h, double J, double epsilon, double gamma, 
   _pbc = pbc;
   _epsilon = epsilon;
   _seed = seed;
-  init();
+  _from_center = _FROM_CENTER_;
+  init( (&randomJJ),(&randomHH));
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
 }
 
 
-void ising1D::init()
+void ising1D::init( double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
 {
   if (size<1)
     _ERROR_("Non valid value of size",);
@@ -485,21 +486,27 @@ void ising1D::init()
   if (_from_center){
     _MESSAGE_("Disorder is generated from the center of the chain");
     for (int i=0;i<size/2;++i){
-      _hh[size/2 - i - 1] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      _hh[size/2 + i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      _JJ[size/2 - i - 1] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      _JJ[size/2 + i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      //_hh[size/2 - i - 1] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      //_hh[size/2 + i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      //_JJ[size/2 - i - 1] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      //_JJ[size/2 + i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      _hh[size/2 - i - 1] = (*HHgen)(size/2 - i - 1,this);
+      _hh[size/2 + i] = (*HHgen)(size/2 + i,this);
+      _JJ[size/2 - i - 1] = (*JJgen)(size/2 - i - 1,this);
+      _JJ[size/2 + i] = (*JJgen)(size/2 + i,this);
     }
   }
   else
     for (int i=0;i<size;++i){
-      _hh[i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      _JJ[i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      //_hh[i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      //_JJ[i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
+      _hh[i] = (*HHgen)(i,this);
+      _JJ[i] = (*JJgen)(i,this);
     }
 
-  //  for (int i=0;i<10;++i){
-  //  cout << _hh[i] << "\t" << _JJ[i] << endl; 
-  //}  
+  for (int i=0;i<10;++i){
+    cout << _hh[i] << "\t" << _JJ[i] << endl; 
+  }  
 
   (*_hamiltonian) = get_hamiltonian();
   solve_diagonalization();
@@ -509,9 +516,36 @@ void ising1D::init()
 #endif
 }
 
+
+
+double randomHH(int i, ising1D* system){
+  return system->get_h() * (1.0 + 2.0*system->get_epsilon()*(drand1()-0.5));
+}
+
+
+double randomJJ(int i, ising1D* system){
+  return system->get_J() * (1.0 + 2.0*system->get_epsilon()*(drand1()-0.5));
+}
+
+
 int ising1D::get_size()
 {
   return size;
+}
+
+double ising1D::get_J()
+{
+  return _J;
+}
+
+double ising1D::get_h()
+{
+  return _h;
+}
+
+double ising1D::get_epsilon()
+{
+  return _epsilon;
 }
 
 
@@ -799,10 +833,10 @@ quench::~quench()
 }
 
 
-quench::quench( in_file* file)
+quench::quench( in_file* file,double (*JJgen0)(int,ising1D*),double (*HHgen0)(int,ising1D*),double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
 {
-  system0 = new ising1D(file,"system0");
-  system = new ising1D(file,"system");
+  system0 = new ising1D(file,"system0",JJgen0,HHgen0);
+  system = new ising1D(file,"system",JJgen,HHgen);
   init();
 #ifdef DEBUG
   _ERROR_TRACKING_;

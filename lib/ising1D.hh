@@ -27,7 +27,6 @@
 #define _SEED_ -1 /**< default seed value. */
 #define _FROM_CENTER_ false /**< boolean value. Starting point of generating disorder */
 
-
 class ising1D;
 
 //!  Energy observable.
@@ -139,6 +138,8 @@ private:
   matrix< complex<double> > *_full_matrix;
 };
 
+double randomHH(int i, ising1D* system);
+double randomJJ(int i, ising1D* system);
 
 // general 1D ising model object
 class ising1D{
@@ -146,7 +147,7 @@ public:
   
   ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
 
-  ising1D( in_file *file, const string name="system");
+  ising1D( in_file *file, const string name="system", double (*JJgen)( int,ising1D* )=&randomJJ, double (*HHgen)( int,ising1D* )=&randomHH);
   ~ising1D();
 
   matrix<double> *UU,*VV;
@@ -155,11 +156,15 @@ public:
   void write( out_file *);
   void read( in_file *, const string);
   int get_size();
-  friend class quench;
+  double get_epsilon();
+  double get_h();
+  double get_J();
   energy* e;
 
+  friend class quench;
+
 private:
-  void init();
+  void init( double (*JJgen)( int,ising1D* ), double (*HHgen)( int,ising1D* ));
   matrix<double>  get_hamiltonian();
   void solve_diagonalization();
   void check( double* eigenval, matrix<double> * eigvect );
@@ -176,13 +181,14 @@ private:
   // length of the chain
   int size;
   bool _from_center; /**< generate disorder from the center of the chain or not */
+  bool _ext;
 };
 
 
 class quench{
 public:
   quench( int size_in, double h0_in, double h_in, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_);
-  quench( in_file* );
+  quench( in_file*,double (*JJgen0)( int,ising1D* )=&randomJJ, double (*HHgen0)( int,ising1D* )=&randomHH,double (*JJgen)( int,ising1D* )=&randomJJ, double (*HHgen)( int,ising1D* )=&randomHH );
   ~quench();
 
   matrix< complex<double> > *UUt,*VVt;
