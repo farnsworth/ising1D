@@ -60,17 +60,19 @@ template<class T>
 class loop {
 public:
   loop( in_file *file, const string name="loop");
+  loop( int steps, T delta, T initval  );
   bool next();
   T get_val();
   T get_max_val();
   int get_index();
   void read( in_file* file, const string name="loop");
   void restart();
-  int steps;
+  loop<T>& operator=( const loop<T> &source);
 private:
-  int index;
-  T delta;
-  T initval;
+  int _steps;
+  int _index;
+  T _delta;
+  T _initval;
 };
 
 

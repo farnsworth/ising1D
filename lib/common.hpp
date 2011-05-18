@@ -63,13 +63,27 @@ double local_obs<T>::get_ensemble_average(double* nk)
 }
 
 
+
+template<class T>
+loop<T>::loop( int steps, T delta, T initval  )
+{
+  _index = 0;
+  _steps = steps;
+  _delta = delta;
+  _initval = initval;
+#ifdef DEBUG
+  _ERROR_TRACKING_();
+#endif
+}
+
+
 template<class T>
 loop<T>::loop(in_file *file, const string name)
 {
-  index = 0;
-  steps = 0;
-  delta = 1;
-  initval = 0;
+  _index = 0;
+  _steps = 0;
+  _delta = 1;
+  _initval = 0;
   read( file, name );
 #ifdef DEBUG
   _ERROR_TRACKING_();
@@ -87,23 +101,36 @@ void loop<T>::read(in_file *file, const string tagname)
   }
   while (  file->read_data(name,data) > 0 ){
     if (name=="steps")
-      istringstream(data) >> steps;
+      istringstream(data) >> _steps;
     else if (name=="delta")
-      istringstream(data) >> delta;
+      istringstream(data) >> _delta;
     else if (name=="initval")
-      istringstream(data) >> initval;
+      istringstream(data) >> _initval;
   }
 #ifdef DEBUG
   _ERROR_TRACKING_();
 #endif
 }
 
+
+template<class T>
+inline loop<T>& loop<T>::operator=( const loop<T> &source)
+{
+  this->_steps = source._steps;
+  this->_index = source._index;
+  this->_delta = source._delta;
+  this->_initval = source._initval;
+
+  return *this;
+}
+
+
 template<class T>
 bool loop<T>::next()
 {
-  if (index>=steps)
+  if (_index>=_steps)
     return false;
-  ++index;
+  ++_index;
   return true;
 }
 
@@ -111,13 +138,13 @@ bool loop<T>::next()
 template<class T>
 int loop<T>::get_index()
 {
-  return index;
+  return _index;
 }
 
 template<class T>
 void loop<T>::restart()
 {
-  index = 0;
+  _index = 0;
 }
 
 template<>
