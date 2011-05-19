@@ -9,5 +9,8 @@ default: $(MF)
 fast: $(MF)
 	make -C../ NRUN=$(N) fast
 
+omp:
+	make -C../ NRUN=$(N) omp
+
 clean:
 	@rm -f *.o out *~
