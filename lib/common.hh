@@ -1,6 +1,9 @@
 #ifndef __COMMON_hh__
 #define __COMMON_hh__
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include "matrices.hh"
 #include "io.hh"
 #include "error.hh"
@@ -32,6 +35,7 @@ template<class T>
 class obs{
 public:
   obs(int size);
+  obs(const obs<T>& source);
   //  virtual double get_from_state(bool* state) = 0;
   // virtual double get_ensemble_average(double* nk) = 0;
   virtual T get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt ) = 0;
@@ -45,6 +49,7 @@ class local_obs : public obs<T> {
 public:
   local_obs( int );
   local_obs( double*, int );
+  local_obs(const local_obs<T>& source);
   ~local_obs();
   double get_from_state(state*);
   double get_ensemble_average(double* nk);
@@ -61,14 +66,18 @@ class loop {
 public:
   loop( in_file *file, const string name="loop");
   loop( int steps, T delta, T initval  );
-  bool next();
-  T get_val();
+  void next();
+  bool again();
+  T get_val( int index=-1);
   T get_max_val();
   int get_index();
+  int get_steps();
   void read( in_file* file, const string name="loop");
   void restart();
+  void splitOMP();
   loop<T>& operator=( const loop<T> &source);
 private:
+  int _sindex;
   int _steps;
   int _index;
   T _delta;

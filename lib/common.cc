@@ -113,37 +113,46 @@ ostream& operator<<(ostream& out, const state &s)
 }
 
 template<>
-double loop<double>::get_val()
+double loop<double>::get_val(int index)
 {
-  return double(index)*delta+initval;
+  if (index==-1)
+    return double(_index)*_delta+_initval;
+  else
+    return double(index)*_delta+_initval;
 }
 
 template<>
-int loop<int>::get_val()
+int loop<int>::get_val( int index)
 {
-  return int(index)*delta+initval;
+  if (index==-1)
+    return int(_index)*_delta+_initval;
+  else
+    return int(index)*_delta+_initval;
 }
 
 template<>
-float loop<float>::get_val()
+float loop<float>::get_val( int index)
 {
-  return float(index)*delta+initval;
+  if (index==-1)
+    return float(_index)*_delta+_initval;
+  else
+    return float(index)*_delta+_initval;
 }
 
 template<>
 double loop<double>::get_max_val()
 {
-  return double(steps)*delta+initval;
+  return double(_steps)*_delta+_initval;
 }
 
 template<>
 int loop<int>::get_max_val()
 {
-  return int(steps)*delta+initval;
+  return int(_steps)*_delta+_initval;
 }
 
 template<>
 float loop<float>::get_max_val()
 {
-  return float(steps)*delta+initval;
+  return float(_steps)*_delta+_initval;
 }

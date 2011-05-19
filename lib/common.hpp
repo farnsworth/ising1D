@@ -4,6 +4,13 @@ obs<T>::obs( int size)
   this->_size = size;
 }
 
+template<class T>
+obs<T>::obs( const obs<T>& source)
+{
+  _size = source._size;
+  _gsv  = source._gsv;
+}
+
 
 template<class T>
 local_obs<T>::local_obs( int size_in) : obs<T>(size_in)
@@ -19,6 +26,18 @@ local_obs<T>::local_obs( double* val, int size_in) : obs<T>(size_in)
   for (int i=0;i<size_in;++i){
     _spvs[i] = val[i];
     this->_gsv -= val[i];
+  }
+}
+
+template<class T>
+local_obs<T>::local_obs(const local_obs<T>& source) : obs<T>(source)
+{
+  if (source._spvs == NULL)
+    _spvs = NULL;
+  else{
+    _spvs = new T[this->_size];
+    for (int i=0;i<this->_size;++i)
+      _spvs[i] = source._spvs[i];
   }
 }
 
@@ -68,6 +87,7 @@ template<class T>
 loop<T>::loop( int steps, T delta, T initval  )
 {
   _index = 0;
+  _sindex = 0;
   _steps = steps;
   _delta = delta;
   _initval = initval;
@@ -81,6 +101,7 @@ template<class T>
 loop<T>::loop(in_file *file, const string name)
 {
   _index = 0;
+  _sindex = 0;
   _steps = 0;
   _delta = 1;
   _initval = 0;
@@ -124,14 +145,34 @@ inline loop<T>& loop<T>::operator=( const loop<T> &source)
   return *this;
 }
 
+template<class T>
+void loop<T>::splitOMP()
+{
+#ifdef _OPENMP
+  int ithread = omp_get_thread_num();
+  int nthread = omp_get_num_threads();
+  int window = this->_steps/nthread;
+  _sindex = ithread*window;
+  _index = _sindex;
+  _steps = (ithread==nthread-1) ? _steps - (nthread-1)*window : window;
+#else
+  _WARNING_("library not compiled with OMP futures");
+#endif
+}
+
 
 template<class T>
-bool loop<T>::next()
+bool loop<T>::again()
 {
-  if (_index>=_steps)
-    return false;
+  if (_index < _sindex + _steps ) return true;
+  return false;
+}
+
+
+template<class T>
+void loop<T>::next()
+{
   ++_index;
-  return true;
 }
 
 
@@ -142,19 +183,25 @@ int loop<T>::get_index()
 }
 
 template<class T>
+int loop<T>::get_steps()
+{
+  return _steps;
+}
+
+template<class T>
 void loop<T>::restart()
 {
-  _index = 0;
+  _index = _sindex;
 }
 
 template<>
-extern double loop<double>::get_val();
+extern double loop<double>::get_val(int index);
 
 template<>
-extern int loop<int>::get_val();
+extern int loop<int>::get_val(int index);
 
 template<>
-extern float loop<float>::get_val();
+extern float loop<float>::get_val(int index);
 
 template<>
 extern double loop<double>::get_max_val();
