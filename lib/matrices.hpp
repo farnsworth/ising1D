@@ -8,6 +8,16 @@ matrix<T>::matrix( int nrow_in, int ncol_in )
 }
 
 template <class T>
+matrix<T>::matrix(const matrix<T>& source)
+{
+  nrow = source.nrow;
+  ncol = source.ncol;
+  pointer = new T[nrow*ncol];
+  *this = source;
+}
+
+
+template <class T>
 int matrix<T>::index( const int irow, const int icol ) const
 {
   if ((irow>=nrow)||(icol>=ncol))
@@ -99,6 +109,18 @@ matrix<T>& matrix<T>::operator=( const matrix<T> &source)
 
   return *this;
 }
+
+template <class T>
+ostream& operator<<( ostream& out, const matrix<T> &m )
+{
+  for (int irow=0;irow<m.nrow;++irow){
+    for (int icol=0;icol<m.ncol;++icol)
+      out << m.pointer[m.index(irow,icol)] << "\t";
+    out << endl;
+  }
+  return out;
+}
+
 
 
 template <class T>

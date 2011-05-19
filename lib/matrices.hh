@@ -19,6 +19,7 @@ template <class T>
 class matrix {
 public:
   matrix( int,int );
+  matrix(const matrix<T>& source); /*< copy constructor */
   ~matrix();
   void print();
 
@@ -26,6 +27,7 @@ public:
   matrix<T>& operator=( const matrix<T> &source);
   matrix<T>& operator=(const T);
 
+  template <class T2> friend ostream& operator<<( ostream& , const matrix<T2> & );
   template <class T2> friend matrix<T2> operator+(const matrix<T2> &, const matrix<T2> &);
   template <class T2> friend matrix<T2> operator-(const matrix<T2> &, const matrix<T2> &);
   template <class T2> friend matrix<T2> operator*(const matrix<T2> &, const matrix<T2> &);
