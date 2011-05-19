@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     ofile << setprecision(10) << setw(20);
 
-    while (time_loop.next()){
+    while (time_loop.again()){
       t = time_loop.get_val();
       ofile << t << "\t";
 
@@ -67,13 +67,15 @@ int main(int argc, char *argv[])
       ofile << mgge;
       
       rho1.set_time_evolution( gigi.UUt, gigi.VVt );
-      while (dist_loop.next()){
+      while (dist_loop.again()){
 	int idist = dist_loop.get_val();
 	ofile << "\t" << rho1.get_time_evolution(idist) << "\t";
 	ofile << rho1.get_ensemble_average(idist);
+	dist_loop.next();
       }
       ofile << endl;
       dist_loop.restart();
+      time_loop.next();
     }
   }
   else

@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     
     ofile << setprecision(15) << setw(25);
 
-    while (time_loop.next()){
+    while (time_loop.again()){
       t = time_loop.get_val();
       ofile << t << "\t";
 
@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
       delete ltmag[isite];
       ltmag[isite] = NULL;
     }
+    time_loop.next();
   }
   else
     _ERROR_("no file name given",-1);
