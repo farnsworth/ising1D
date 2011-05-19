@@ -195,19 +195,19 @@ void loop<T>::restart()
 }
 
 template<>
-extern double loop<double>::get_val(int index);
+double loop<double>::get_val(int index);
 
 template<>
-extern int loop<int>::get_val(int index);
+int loop<int>::get_val(int index);
 
 template<>
-extern float loop<float>::get_val(int index);
+float loop<float>::get_val(int index);
 
 template<>
-extern double loop<double>::get_max_val();
+double loop<double>::get_max_val();
 
 template<>
-extern int loop<int>::get_max_val();
+int loop<int>::get_max_val();
 
 template<>
-extern float loop<float>::get_max_val();
+float loop<float>::get_max_val();

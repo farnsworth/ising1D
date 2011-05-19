@@ -259,13 +259,13 @@ T matrix<T>::det()
 }
 
 template<>
-extern double* matrix<double>::diagonalize( bool evect );
+double* matrix<double>::diagonalize( bool evect );
 
 template <>
-extern matrix< complex<double> > matrix< complex<double> >::conjugate();
+matrix< complex<double> > matrix< complex<double> >::conjugate();
 
 template<>
-extern double matrix<double>::det();
+double matrix<double>::det();
 
 template <>
-extern complex<double> matrix< complex<double> >::det();
+complex<double> matrix< complex<double> >::det();
