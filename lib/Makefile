@@ -1,10 +1,13 @@
+FLAGS=
 
 ifneq ($(strip $(shell which g++)),)
         COMPILER=g++
+	FLAGS += -fopenmp
 endif
 
 ifneq ($(strip $(shell which icpc)),)
         COMPILER=icpc
+	FLAGS += -openmp
 endif
 
 SOURCE = $(shell ls *.cc)
@@ -15,8 +18,7 @@ HEADERS = $(shell ls *.hh)
 HEADERS_CODE = $(shell ls *.hpp)
 
 INCLUDEDIR=-I../external/
-#FLAGS=-framework veclib
-FLAGS =-O3 -DUSUAL_ALG
+FLAGS += -O3 -DUSUAL_ALG
 #-DDK_ALG
 #-Wall -pedantic
 
