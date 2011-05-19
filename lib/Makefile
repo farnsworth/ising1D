@@ -1,13 +1,12 @@
-FLAGS=
 
 ifneq ($(strip $(shell which g++)),)
         COMPILER=g++
-	FLAGS += -fopenmp
+	FLAGS = -fopenmp
 endif
 
 ifneq ($(strip $(shell which icpc)),)
         COMPILER=icpc
-	FLAGS += -openmp
+	FLAGS = -openmp
 endif
 
 SOURCE = $(shell ls *.cc)
