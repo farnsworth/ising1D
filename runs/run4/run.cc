@@ -1,9 +1,9 @@
 
 #include "ising1D.hh"
 #include "error.hh"
+#include "matrices.hh"
 #include "io.hh"
 #include "common.hh"
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -52,28 +52,43 @@ int main(int argc, char *argv[])
     cicj2.set_spvs();
     double cicj2gge = cicj2.get_ensemble_average( gigi.gge );
     
-    ofile << setprecision(15) << setw(25);
+    matrix<double> outdata(time_loop.get_steps(),11);
 
-    complex<double> temp;
+#pragma omp parallel firstprivate(time_loop)
+    {
+      time_loop.splitOMP();
+      complex<double> temp;
+      matrix< complex<double> > UU(size,size),VV(size,size);
 
-    while (time_loop.next()){
-      t = time_loop.get_val();
-      ofile << t << "\t";
+      while (time_loop.again()){
+      	t = time_loop.get_val();
+	int ii = time_loop.get_index();
+	
+	outdata(ii,0) = t;
 
-      gigi.set_time_evolution(t);
+	gigi.set_time_evolution(t,&UU,&VV);
 
-      ofile << tmag1.get_time_evolution(gigi.UUt, gigi.VVt)/double(gigi.get_size()) << "\t";
-      ofile << mgge << "\t";
+	outdata(ii,1) = tmag1.get_time_evolution( &UU, &VV)/double(size);
+	outdata(ii,2) = mgge;
 
-      ofile << ltmag.get_time_evolution(gigi.UUt, gigi.VVt) << "\t" << lgge << "\t";
+	outdata(ii,3) = ltmag.get_time_evolution( &UU, &VV);
+	outdata(ii,4) = lgge;
 
-      temp = cicj1.get_time_evolution(gigi.UUt, gigi.VVt);
-      ofile << real(temp) << "\t" << imag(temp) << "\t" << cicj1gge << "\t";
+	temp = cicj1.get_time_evolution( &UU, &VV);
+	outdata(ii,5) = real(temp);
+	outdata(ii,6) = imag(temp);
+	outdata(ii,7) = cicj1gge;
       
-      temp = cicj2.get_time_evolution(gigi.UUt, gigi.VVt);
-      ofile << real(temp) << "\t" << imag(temp) << "\t" << cicj2gge << endl;
-
+	temp = cicj2.get_time_evolution( &UU, &VV );
+	outdata(ii,8) = real(temp);
+	outdata(ii,9) = imag(temp);
+	outdata(ii,10) = cicj2gge;
+	
+      	time_loop.next();
+      }
     }
+    ofile << setprecision(15) << setw(25);
+    ofile << outdata;
   }
   else
     _ERROR_("no file name given",-1);
