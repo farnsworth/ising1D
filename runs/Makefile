@@ -16,7 +16,7 @@ endif
 
 ifneq ($(strip $(shell which icpc)),)
 	COMPILER=icpc
-	OMPFLAG  -openmp
+	OMPFLAG = -openmp
 endif
 
 INCLUDEDIR=-I../external -I../lib
