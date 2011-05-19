@@ -194,6 +194,7 @@ public:
   matrix< complex<double> > *UUt,*VVt;
   double* gge;
   void set_time_evolution( const double );
+  void set_time_evolution( const double , matrix< complex<double> > *, matrix< complex<double> > * );
   void set_gge_occupations( );
   int get_size();
   double get_calpha2( state* );

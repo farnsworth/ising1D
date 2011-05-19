@@ -506,7 +506,7 @@ void ising1D::init( double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
 
   //  for (int i=45;i<55;++i){
   //  cout << _hh[i] << "\t" << _JJ[i] << endl; 
-  //}  
+  //}
 
   (*_hamiltonian) = get_hamiltonian();
   solve_diagonalization();
@@ -880,33 +880,29 @@ void quench::set_gge_occupations()
 }
 
 
-void quench::set_time_evolution( const double time )
+void quench::set_time_evolution( const double time, matrix<complex<double> > * UU, matrix<complex<double> > * VV )
 {
-  matrix< complex<double> > te(size,size);
-  matrix< complex<double> > tec(size,size);
+  matrix< complex<double> > te = get_evolution_matrix(time);
+  matrix< complex<double> > tec = te.conjugate();
   matrix< complex<double> > AA(size,size);
   matrix< complex<double> > BB(size,size);
-
-  te = get_evolution_matrix(time);
-  tec = te.conjugate();
   
   AA = *(system->UU) * te * system->UU->daga();
   AA = AA + (system->VV->conjugate() * tec * system->VV->transpose());
   BB = *(system->VV) * te * system->UU->daga();
   BB = BB + (system->UU->conjugate() * tec * system->VV->transpose());
   
-  (*UUt) = AA * *(system0->UU) + BB.conjugate() * *(system0->VV);
-  (*VVt) = BB * *(system0->UU) + AA.conjugate() * *(system0->VV);
+  (*UU) = AA * *(system0->UU) + BB.conjugate() * *(system0->VV);
+  (*VV) = BB * *(system0->UU) + AA.conjugate() * *(system0->VV);
 
-  /* uncomment to check the unitarity of time evolution
-     cout << "check" << endl;
-     (UUt->daga() * *(UUt) + VVt->daga() * *(VVt)).print();
-     (UUt->daga() * *(UUt) + VVt->daga() * *(VVt)).print();
-  */
-  
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
+}
+
+void quench::set_time_evolution( const double time )
+{
+  set_time_evolution(time, UUt,VVt);
 }
 
 
