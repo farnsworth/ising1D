@@ -11,10 +11,12 @@ DIR=$(shell pwd)/..
 
 ifneq ($(strip $(shell which g++)),)
 	COMPILER=g++
+	OMPFLAG = -fopenmp
 endif
 
 ifneq ($(strip $(shell which icpc)),)
 	COMPILER=icpc
+	OMPFLAG  -openmp
 endif
 
 INCLUDEDIR=-I../external -I../lib
@@ -40,15 +42,20 @@ ifeq ($(UNAME), Darwin)
    LIB += -framework veclib
 endif
 
-COMMAND:= $(COMPILER) $(FLAGS) $(LIB) $(ISING1DLIB) $(MFO) -o $(OUT)
+COMMAND= $(COMPILER) $(FLAGS) $(LIB) $(ISING1DLIB) $(MFO) -o $(OUT)
 
-default: FLAGS += -DDEBUG
+#default: FLAGS += -DDEBUG
+#default: $(MFO) $(ISING1DLIB)
+#	@echo $(MF)
+#	$(COMMAND)
+
+default: FLAGS += -O3
 default: $(MFO) $(ISING1DLIB)
-	@echo $(MF)
 	$(COMMAND)
 
-fast: FLAGS += -O3
-fast: $(MFO) $(ISING1DLIB)
+
+omp: FLAGS += $(OMPFLAG)
+omp: $(MFO) $(ISING1DLIB)
 	$(COMMAND)
 
 all: force_look
@@ -61,7 +68,7 @@ clean:
 	@rm -f run*/*.o run*/*out run*/*~
 
 %.o: %.cc
-	echo $(DIR)
+#	echo $(DIR)
 	$(COMPILER) $(FLAGS) $(INCLUDEDIR) -c $< -o $*.o
 
 force_look:
