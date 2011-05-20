@@ -269,3 +269,15 @@ double matrix<double>::det();
 
 template <>
 complex<double> matrix< complex<double> >::det();
+
+
+#ifdef BLAS
+template <>
+matrix<float> operator*(const matrix<float> &c1,const matrix<float> &c2);
+template <>
+matrix<double> operator*(const matrix<double> &c1,const matrix<double> &c2);
+template <>
+matrix< complex<float> > operator*(const matrix< complex<float> > &c1,const matrix< complex<float> > &c2);
+template <>
+matrix< complex<double> > operator*(const matrix< complex<double> > &c1,const matrix< complex<double> > &c2);
+#endif

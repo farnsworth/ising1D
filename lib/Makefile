@@ -9,6 +9,7 @@ ifneq ($(strip $(shell which icpc)),)
 	FLAGS = -openmp
 endif
 
+
 SOURCE = $(shell ls *.cc)
 
 OBJECTS = $(SOURCE:.cc=.o)
@@ -22,6 +23,9 @@ FLAGS += -O3 -DUSUAL_ALG
 #-Wall -pedantic
 
 default: $(HEADERS) $(HEADERS_CODE) $(OBJECTS)
+
+blas: FLAGS += -DBLAS
+blas: default
 
 clean:
 	@rm -f *.o *~

@@ -3,6 +3,9 @@
 #define __GEN_MATRICES_hh__
 
 #include "error.hh"
+#ifdef BLAS
+#include <vecLib/cblas.h>
+#endif
 #include <iostream>
 #include <iomanip>
 #include <cmath>
