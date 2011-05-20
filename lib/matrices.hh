@@ -3,13 +3,17 @@
 #define __GEN_MATRICES_hh__
 
 #include "error.hh"
-#ifdef BLAS
-#include <vecLib/cblas.h>
-#endif
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 #include <complex>
+#ifdef BLAS
+#ifdef __APPLE__
+#include <vecLib/cblas.h>
+#else
+#include <gsl/gsl_cblas.h>
+#endif
+#endif
 using namespace std;
 
 extern "C" void dsyev_(char *, char *, int *, double *, int *, double *, double *, int *, int * );
