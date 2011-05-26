@@ -60,7 +60,7 @@ omp: $(MFO) $(ISING1DLIB)
 
 all: force_look
 	@for dir in $(ALLRUNS);do \
-	$(MAKE) -C$${dir} fast; \
+	$(MAKE) -C$${dir} omp; \
 	done;
 
 clean:
