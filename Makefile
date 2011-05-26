@@ -21,7 +21,7 @@ all: force_look
 
 clean:
 	@rm -f *.o out *~
-	@rm utilities/*~
+	@rm -f utilities/*~
 	@for dir in $(ALLDIR);do \
 	$(MAKE) -C$${dir} clean; \
 	done;
