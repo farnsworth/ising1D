@@ -150,15 +150,6 @@ matrix< complex<double> > matrix< complex<double> >::conjugate()
 
 #ifdef BLAS
 /*SUBROUTINE SGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
-*     .. Scalar Arguments ..
-  REAL ALPHA,BETA
-  INTEGER K,LDA,LDB,LDC,M,N
-  CHARACTER TRANSA,TRANSB
-*     ..
-*     .. Array Arguments ..
-  REAL A(LDA,*),B(LDB,*),C(LDC,*)
-*     ..
-*
 *  Purpose
 *  =======
 *
@@ -263,6 +254,8 @@ template <>
 matrix<float> operator*(const matrix<float> &a,const matrix<float> &b)
 {
   matrix<float> result(a.nrow,b.ncol);
+
+  cout << "you are using float cblas routine";
   
   if (a.ncol != b.nrow)
     _ERROR_("you are multipling  two incompatible matrices",result);
@@ -282,19 +275,20 @@ matrix<float> operator*(const matrix<float> &a,const matrix<float> &b)
 template <>
 matrix<double> operator*(const matrix<double> &a,const matrix<double> &b)
 {
+  cout << "you are using float cblas routine";
 }
 
 
 template <>
 matrix< complex<float> > operator*(const matrix< complex<float> > &c1,const matrix< complex<float> > &c2)
 {
-
+  cout << "you are using float cblas routine";
 }
 
 
 template <>
 matrix< complex<double> > operator*(const matrix< complex<double> > &c1,const matrix< complex<double> > &c2)
 {
-
+  cout << "you are using float cblas routine";
 }
 #endif
