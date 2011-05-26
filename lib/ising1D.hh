@@ -117,6 +117,7 @@ private:
 };
 
 
+
 class rho : public obs<double>{
 public:
   rho(int i, int r, ising1D *);
@@ -137,6 +138,27 @@ private:
   matrix<double> *_reduced_matrix;
   matrix< complex<double> > *_full_matrix;
 };
+
+
+class rhozz : public obs<double>{
+public:
+  rhozz(int i, int r, ising1D *);
+  ~rhozz();
+
+  void set_ensemble_average();
+  double get_ensemble_average(double* nk);
+  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt );
+private:
+  ising1D *_system;
+  int _r,_i;
+  BiAj *_BlAl,*_BmAm,*_BmAl,*_BlAm;
+  AiAj *_AlAm;
+  BiBj *_BlBm;
+};
+
+
+
+
 
 double randomHH(int i, ising1D* system);
 double randomJJ(int i, ising1D* system);

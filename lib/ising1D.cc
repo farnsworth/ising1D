@@ -295,6 +295,7 @@ void BiBj::set_gsv()
     _gsv=0.0;
 }
 
+
 rho::rho( int i,int r, ising1D * system) : obs<double>( system->get_size())
 {
   if ((i+r > system->get_size()) || (i < 0)){
@@ -351,7 +352,7 @@ double rho::get_ensemble_average(int l)
 
 double rho::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt )
 {
-  return 0.0;
+  _ERROR_("wrong use of rho object",0.0);
 }
 
 void rho::set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt ){
@@ -421,6 +422,72 @@ rho::~rho()
   delete _reduced_matrix;
   delete _BiAjmatrix;
   delete _full_matrix;
+}
+
+
+
+
+rhozz::rhozz( int i,int r, ising1D * system) : obs<double>( system->get_size())
+{
+  if ((i+r > system->get_size()) || (i < 0)){
+    _ERROR_("indexes outside the chain",);
+  }
+  _system = system;
+  _r = r;
+  _i = i;
+  _BlAl = new BiAj(i,i,system);
+  _BmAm = new BiAj(i+r, i+r, system);
+  _BmAl = new BiAj(i+r, i, system);
+  _BlAm = new BiAj(i, i+r, system);
+  _AlAm = new AiAj(i, i+r, system);
+  _BlBm = new BiBj(i, i+r, system);
+}
+
+void rhozz::set_ensemble_average()
+{
+  _BlAl->set_spvs();
+  _BmAm->set_spvs();
+  _BmAl->set_spvs();
+  _BlAm->set_spvs();
+  _AlAm->set_spvs();
+  _BlBm->set_spvs();
+}
+
+double rhozz::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+{
+  double result;
+  
+  result = _BlAl->get_time_evolution(UUt,VVt)* _BmAm->get_time_evolution(UUt,VVt);
+  result -= _BmAl->get_time_evolution(UUt,VVt)* _BlAm->get_time_evolution(UUt,VVt);
+  result -= real( _AlAm->get_time_evolution(UUt,VVt)* _BlBm->get_time_evolution(UUt,VVt) );
+
+  return result;
+}
+
+
+
+double rhozz::get_ensemble_average( double *nk )
+{
+  double result;
+  
+  result = _BlAl->get_ensemble_average(nk) * _BmAm->get_ensemble_average(nk);
+  result -= _BmAl->get_ensemble_average(nk) * _BlAm->get_ensemble_average(nk);
+  if (_r==0)
+    result += 1.0;
+  
+  return result;
+}
+
+
+
+rhozz::~rhozz()
+{
+  delete _BlAl;
+  delete _BmAm;
+  delete _BmAl;
+  delete _BlAm;
+  delete _AlAm;
+  delete _BlBm;
 }
 
 
