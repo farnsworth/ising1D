@@ -1,0 +1,7 @@
+run 6:
+it does a calculation of:
+1 - \sigma^z_i (local transverse magnetization)
+    at the center of the chain
+2 - \rho^xx_(i,l) with i at the center
+    and l 5 and 10
+as a function of time and GGE averaes
