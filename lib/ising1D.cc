@@ -311,6 +311,35 @@ rho::rho( int i,int r, ising1D * system) : obs<double>( system->get_size())
 }
 
 
+rho::rho(const rho& source) : obs<double>( source )
+{
+  /* ATTENTION */
+  /* they point to the same system and same _BiAjmatrix elements (not matrix) */
+  _system = source._system;
+  _r = source._r;
+  _i = source._i;
+
+  if (source._BiAjmatrix == NULL)
+    _BiAjmatrix = NULL;
+  else{
+    _BiAjmatrix = new matrix< BiAj* >(_r,_r);
+    for( int irow=0;irow<_r;++irow)
+      for ( int icol=0;icol<_r;++icol)
+	(*_BiAjmatrix)(irow,icol) = new BiAj(*( (*source._BiAjmatrix)(irow,icol) ));
+  }
+
+  if (source._reduced_matrix == NULL)
+    _reduced_matrix = NULL;
+  else
+    _reduced_matrix = new matrix<double>( *(source._reduced_matrix) );
+
+  if (source._full_matrix == NULL)
+    _full_matrix = NULL;
+  else
+    _full_matrix = new matrix< complex<double> >( *(source._full_matrix));
+}
+
+
 void rho::set_BiAjpointers()
 {
   _BiAjmatrix = new matrix< BiAj* >(_r,_r);
@@ -419,6 +448,7 @@ rho::~rho()
   for( int irow=0;irow<_r;++irow)
     for ( int icol=0;icol<_r;++icol)
       delete (*_BiAjmatrix)(irow,icol);
+
   delete _reduced_matrix;
   delete _BiAjmatrix;
   delete _full_matrix;
@@ -934,7 +964,10 @@ void quench::set_gge_occupations()
   matrix<double> temp(size,size);
   gge = new double[size];
   
-  temp = system->UU->transpose()* *(system0->VV) + system->VV->transpose()* *(system0->UU);
+  // modified
+  //  temp = system->UU->transpose()* *(system0->VV) + system->VV->transpose()* *(system0->UU);
+
+  temp = gemm(*system->UU,'T',*system0->VV,'N')+gemm(*system->VV,'T',*system0->UU,'N');
   
   for (int mu=0;mu<size;++mu){
     gge[mu] = 0.0;
@@ -954,13 +987,23 @@ void quench::set_time_evolution( const double time, matrix<complex<double> > * U
   matrix< complex<double> > AA(size,size);
   matrix< complex<double> > BB(size,size);
   
-  AA = *(system->UU) * te * system->UU->daga();
-  AA = AA + (system->VV->conjugate() * tec * system->VV->transpose());
-  BB = *(system->VV) * te * system->UU->daga();
-  BB = BB + (system->UU->conjugate() * tec * system->VV->transpose());
+  /* we can optimize this part */
+
+  //  AA = *(system->UU) *gemm(te,'N', *system->UU,'C');
+  //AA = AA + (system->VV->conjugate() * tec * system->VV->transpose());
+  // BB = *(system->VV) * te * system->UU->daga();
+  //BB = BB + (system->UU->conjugate() * tec * system->VV->transpose());
   
-  (*UU) = AA * *(system0->UU) + BB.conjugate() * *(system0->VV);
-  (*VV) = BB * *(system0->UU) + AA.conjugate() * *(system0->VV);
+  //(*UU) = AA * *(system0->UU) + BB.conjugate() * *(system0->VV);
+  //(*VV) = BB * *(system0->UU) + AA.conjugate() * *(system0->VV);
+
+  AA = gemm( *(system->UU),'N',gemm(te,'N', *system->UU,'D'),'N');
+  AA = AA + gemm(system->VV->conjugate(),'N',gemm(tec,'N',*system->VV,'T'),'N');
+  BB = gemm(*(system->VV),'N', gemm(te,'N',*system->UU,'D'),'N');
+  BB = BB + gemm( system->UU->conjugate(),'N',gemm(tec,'N',*system->VV,'T'),'N');
+  
+  (*UU) = gemm(AA,'N',*(system0->UU),'N') + gemm(BB.conjugate(),'N', *(system0->VV), 'N');
+  (*VV) = gemm(BB,'N',*(system0->UU),'N') + gemm(AA.conjugate(),'N', *(system0->VV), 'N');
 
 #ifdef DEBUG
   _ERROR_TRACKING_;

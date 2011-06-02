@@ -37,7 +37,6 @@ class energy : public local_obs<double>{
 public:
   energy( double *, int );
   double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-private:
 };
 
 
@@ -122,6 +121,7 @@ class rho : public obs<double>{
 public:
   rho(int i, int r, ising1D *);
   ~rho();
+  rho( const rho& source ); /*< copy constructor */
 
   void set_ensemble_average(double* nk);
   double get_ensemble_average(int l=-1);
@@ -165,8 +165,7 @@ double randomJJ(int i, ising1D* system);
 
 // general 1D ising model object
 class ising1D{
-public:
-  
+public:  
   ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
 
   ising1D( in_file *file, const string name="system", double (*JJgen)( int,ising1D* )=&randomJJ, double (*HHgen)( int,ising1D* )=&randomHH);
