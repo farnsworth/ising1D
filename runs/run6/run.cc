@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
     gigi.set_gge_occupations();
     int size = gigi.get_size();
 
-    int ndata = 10;
-    int delta = 2;
+    int ndata = 4;
+    int delta = 5;
     rho rhov(size/2, ndata*delta,gigi.system);
     rhov.set_ensemble_average(gigi.gge);
     rhozz * rhozzv[ndata];
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     matrix<double> outdata1(time_loop.get_steps(),2*ndata+1);
     matrix<double> outdata2(time_loop.get_steps(),2*ndata+1);
 
-#pragma omp parallel firstprivate(time_loop)
+#pragma omp parallel firstprivate(time_loop,rhov)
     {
       time_loop.splitOMP();
       
