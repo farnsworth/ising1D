@@ -38,7 +38,7 @@ int matrix<T>::get_ncol() const
 }
 
 template <class T>
-T& matrix<T>::operator() ( const int irow, const int icol )
+T& matrix<T>::operator() ( const int irow, const int icol ) const
 {
   return pointer[index(irow,icol)];
 }
@@ -52,7 +52,7 @@ matrix<T>::~matrix()
 
 
 template <class T>
-matrix<T> matrix<T>::transpose()
+matrix<T> matrix<T>::transpose() const
 {
   matrix<T> result = matrix(ncol,nrow);
   
@@ -65,7 +65,7 @@ matrix<T> matrix<T>::transpose()
 
 /* in general it is an identity, for complex numbers see matrices.cc*/
 template <class T>
-matrix<T> matrix<T>::conjugate()
+matrix<T> matrix<T>::conjugate() const
 {
   matrix<T> result = matrix(nrow,ncol);
   
@@ -78,7 +78,7 @@ matrix<T> matrix<T>::conjugate()
 
 
 template <class T>
-matrix<T> matrix<T>::daga()
+matrix<T> matrix<T>::daga() const
 {
   return (this->conjugate()).transpose();
 }
@@ -157,20 +157,52 @@ matrix<T> operator-(const matrix<T> &c1, const matrix<T> &c2)
 template <class T>
 matrix<T> operator*(const matrix<T> &c1,const matrix<T> &c2)
 {
-  matrix<T> result(c1.nrow,c2.ncol);
+  return gemm(c1,'N',c2,'N');
+}
+
+
+template <class T>
+matrix<T> gemm( const matrix<T> &a, const char transa, const matrix<T> &\
+	   b, const char transb)
+{
+  int M = ( (transa=='N')||(transa=='n') ) ? a.nrow : a.ncol;
+  int N = ( (transb=='N')||(transb=='n') ) ? b.ncol : b.nrow;
+  int K = ( (transa=='N')||(transa=='n') ) ? a.ncol : a.nrow;
+  int Kcheck = ( (transb=='N')||(transb=='n') ) ? b.nrow : b.ncol;
+
+  matrix<T> result(M,N);
+  /* check for dimension errors */
+  if ( (K != Kcheck) )
+    _ERROR_("incompatible matrices",result);
+
+  matrix<T> c1(M,K),c2(K,N);
   
-  if (c1.ncol != c2.nrow)
-    _ERROR_("you are multipling  two incompatible matrices",result);
-  
+  if ( ( (transa=='N')||(transa=='n') ) )
+    c1 = a;
+  else if ( ( (transa=='T')||(transa=='t') ) )
+    c1 = a.transpose();
+  else
+    c1 = a.daga();
+
+
+  if ( ( (transb=='N')||(transb=='n') ) )
+    c2 = b;
+  else if ( ( (transb=='T')||(transb=='t') ) )
+    c2 = b.transpose();
+  else
+    c2 = b.daga();
+
   result = 0.0;
   
-  for (int irow=0;irow<c1.nrow;++irow)
-    for (int icol=0;icol<c2.ncol;++icol)
-      for (int k=0;k<c1.ncol;++k)
-	result(irow,icol) += c1.pointer[c1.index(irow,k)]*c2.pointer[c2.index(k,icol)];
+  for (int irow=0;irow<M;++irow)
+    for (int icol=0;icol<N;++icol)
+      for (int ik=0;ik<K;++ik)
+	result(irow,icol) += c1.pointer[c1.index(irow,ik)]*c2.pointer[c2.index(ik,icol)];
 
   return result;
 }
+
+
 
 
 template <class T>
@@ -199,45 +231,29 @@ matrix<T> operator*(const matrix<T> &source, const T alpha )
 /*      complex matrix time a matrix gives always a complex matrix     */
 
 template <class T>
-matrix< complex<T> > operator*(const matrix< complex<T> > &c1, const matrix<T> &c2)
+matrix< complex<T> > gemm(const matrix< complex<T> > &a, const char transa, const matrix<T> &b, const char transb)
 {
-  matrix< complex<T> > result(c1.nrow,c2.ncol);
-
-  if (c1.ncol != c2.nrow)
-    _ERROR_("you are multipling  two incompatible matrices",result);
+  matrix< complex<T> > temp(b.nrow,b.ncol);
+  for (int irow=0;irow<b.nrow;++irow)
+    for (int icol=0;icol<b.ncol;++icol)
+      temp(irow,icol) = b(irow,icol);
   
-  result = complex<T>(0.0,0.0);
-  
-  for (int irow=0;irow<c1.nrow;++irow)
-    for (int icol=0;icol<c2.ncol;++icol)
-      for (int k=0;k<c1.ncol;++k)
-	result(irow,icol) += c1.pointer[c1.index(irow,k)]*c2.pointer[c2.index(k,icol)];
-
-  return result;
+  return gemm(a,transa,temp,transb);
 }
 
 template <class T>
-matrix< complex<T> > operator*( const matrix<T> &c1, const matrix< complex<T> > &c2 )
+matrix< complex<T> > gemm( const matrix<T> &a, const char transa, const matrix< complex<T> > &b, const char transb )
 {
-  matrix< complex<T> > result(c1.nrow,c2.ncol);
-
-  if (c1.ncol != c2.nrow)
-    _ERROR_("you are multipling  two incompatible matrices",result);
-  
-  result = complex<T>(0.0,0.0);
-  
-  for (int irow=0;irow<c1.nrow;++irow)
-    for (int icol=0;icol<c2.ncol;++icol)
-      for (int k=0;k<c1.ncol;++k)
-	result(irow,icol) += c1.pointer[c1.index(irow,k)]*c2.pointer[c2.index(k,icol)];
-
-  return result;
+  matrix< complex<T> > temp(a.nrow,a.ncol);
+  for (int irow=0;irow<a.nrow;++irow)
+    for (int icol=0;icol<a.ncol;++icol)
+      temp(irow,icol) = a(irow,icol);
+  return gemm(temp,transa,b,transb);
 }
-
 /* -------------------------------------------------------------------- */
 
 template <class T>
-void matrix<T>::print()
+void matrix<T>::print() const
 {
   for (int irow=0;irow<nrow;++irow){
     for (int icol=0;icol<ncol;++icol)
@@ -262,7 +278,7 @@ template<>
 double* matrix<double>::diagonalize( bool evect );
 
 template <>
-matrix< complex<double> > matrix< complex<double> >::conjugate();
+matrix< complex<double> > matrix< complex<double> >::conjugate() const;
 
 template<>
 double matrix<double>::det();
@@ -272,12 +288,15 @@ complex<double> matrix< complex<double> >::det();
 
 
 #ifdef BLAS
-template <>
-matrix<float> operator*(const matrix<float> &c1,const matrix<float> &c2);
-template <>
-matrix<double> operator*(const matrix<double> &c1,const matrix<double> &c2);
-template <>
-matrix< complex<float> > operator*(const matrix< complex<float> > &c1,const matrix< complex<float> > &c2);
-template <>
-matrix< complex<double> > operator*(const matrix< complex<double> > &c1,const matrix< complex<double> > &c2);
+template<>
+matrix<float> gemm( const matrix<float> &a, const char trana, const matrix<float> &b, const char tranb);
+
+template<>
+matrix<double> gemm( const matrix<double> &a, const char trana, const matrix<double> &b, const char tranb);
+
+template<>
+matrix<complex<float> > gemm( const matrix<complex<float> > &a, const char trana, const matrix<complex<float> > &b, const char tranb);
+
+template<>
+matrix<complex<double> > gemm( const matrix<complex<double> > &a, const char trana, const matrix<complex<double> > &b, const char tranb );
 #endif

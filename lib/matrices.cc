@@ -30,7 +30,6 @@ double matrix<double>::det( )
   return result;
 }
 
-
 template <>
 complex<double> matrix< complex<double> >::det( )
 {
@@ -55,6 +54,7 @@ complex<double> matrix< complex<double> >::det( )
   delete [] pivot;
   return result;
 }
+
 
 #ifdef USUAL_ALG
 template <>
@@ -134,7 +134,7 @@ double* matrix<double>::diagonalize( bool evect )
 
 
 template <>
-matrix< complex<double> > matrix< complex<double> >::conjugate()
+matrix< complex<double> > matrix< complex<double> >::conjugate() const
 {
   matrix< complex<double> > result = matrix(nrow,ncol);
 
@@ -149,146 +149,158 @@ matrix< complex<double> > matrix< complex<double> >::conjugate()
 
 
 #ifdef BLAS
-/*SUBROUTINE SGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
-*  Purpose
-*  =======
-*
-*  SGEMM  performs one of the matrix-matrix operations
-*
-*     C := alpha*op( A )*op( B ) + beta*C,
-*
-*  where  op( X ) is one of
-*
-*     op( X ) = X   or   op( X ) = X**T,
-*
-*
-*  Arguments
-*  ==========
-*
-*  TRANSA - CHARACTER*1.
-*           On entry, TRANSA specifies the form of op( A ) to be used in
-*           the matrix multiplication as follows:
-*
-*              TRANSA = 'N' or 'n',  op( A ) = A.
-*              TRANSA = 'T' or 't',  op( A ) = A**T.
-*              TRANSA = 'C' or 'c',  op( A ) = A**T.
-*
-*  TRANSB - CHARACTER*1.
-*           On entry, TRANSB specifies the form of op( B ) to be used in
-*           the matrix multiplication as follows:
-*
-*              TRANSB = 'N' or 'n',  op( B ) = B.
-*              TRANSB = 'T' or 't',  op( B ) = B**T.
-*              TRANSB = 'C' or 'c',  op( B ) = B**T.
-*
-*  M      - INTEGER.
-*           On entry,  M  specifies  the number  of rows  of the  matrix
-*           op( A )  and of the  matrix  C.  M  must  be at least  zero.
-*           Unchanged on exit.
-*
-*  N      - INTEGER.
-*           On entry,  N  specifies the number  of columns of the matrix
-*           op( B ) and the number of columns of the matrix C. N must be
-*           at least zero.
-*           Unchanged on exit.
-*
-*  K      - INTEGER.
-*           On entry,  K  specifies  the number of columns of the matrix
-*           op( A ) and the number of rows of the matrix op( B ). K must
-*           be at least  zero.
-*           Unchanged on exit.
-*
-*  ALPHA  - REAL            .
-*           On entry, ALPHA specifies the scalar alpha.
-*           Unchanged on exit.
-*
-*  A      - REAL             array of DIMENSION ( LDA, ka ), where ka is
-*           k  when  TRANSA = 'N' or 'n',  and is  m  otherwise.
-*           Before entry with  TRANSA = 'N' or 'n',  the leading  m by k
-*           part of the array  A  must contain the matrix  A,  otherwise
-*           the leading  k by m  part of the array  A  must contain  the
-*           matrix A.
-*           Unchanged on exit.
-*
-*  LDA    - INTEGER.
-*           On entry, LDA specifies the first dimension of A as declared
-*           in the calling (sub) program. When  TRANSA = 'N' or 'n' then
-*           LDA must be at least  max( 1, m ), otherwise  LDA must be at
-*           least  max( 1, k ).
-*           Unchanged on exit.
-*
-*  B      - REAL             array of DIMENSION ( LDB, kb ), where kb is
-*           n  when  TRANSB = 'N' or 'n',  and is  k  otherwise.
-*           Before entry with  TRANSB = 'N' or 'n',  the leading  k by n
-*           part of the array  B  must contain the matrix  B,  otherwise
-*           the leading  n by k  part of the array  B  must contain  the
-*           matrix B.
-*           Unchanged on exit.
-*
-*  LDB    - INTEGER.
-*           On entry, LDB specifies the first dimension of B as declared
-*           in the calling (sub) program. When  TRANSB = 'N' or 'n' then
-*           LDB must be at least  max( 1, k ), otherwise  LDB must be at
-*           least  max( 1, n ).
-*           Unchanged on exit.
-*
-*  BETA   - REAL            .
-*           On entry,  BETA  specifies the scalar  beta.  When  BETA  is
-*           supplied as zero then C need not be set on input.
-*           Unchanged on exit.
-*
-*  C      - REAL             array of DIMENSION ( LDC, n ).
-*           Before entry, the leading  m by n  part of the array  C must
-*           contain the matrix  C,  except when  beta  is zero, in which
-*           case C need not be set on entry.
-*           On exit, the array  C  is overwritten by the  m by n  matrix
-*           ( alpha*op( A )*op( B ) + beta*C ).
-*
-*  LDC    - INTEGER.
-*           On entry, LDC specifies the first dimension of C as declared
-*           in  the  calling  (sub)  program.   LDC  must  be  at  least
-*           max( 1, m ).
-*           Unchanged on exit. */
-
 template <>
-matrix<float> operator*(const matrix<float> &a,const matrix<float> &b)
+matrix<float> gemm( const matrix<float> &a, const char transa, const matrix<float> &b, const char transb)
 {
-  matrix<float> result(a.nrow,b.ncol);
 
-  cout << "you are using float cblas routine";
-  
-  if (a.ncol != b.nrow)
-    _ERROR_("you are multipling  two incompatible matrices",result);
-  
-  enum CBLAS_TRANSPOSE transa = CblasNoTrans,transb = CblasNoTrans;
-  enum CBLAS_ORDER order = CblasRowMajor;
-  int M = a.nrow, N = b.ncol, K = a.ncol;
-  int LDA = M, LDB = K, LDC = M;
+  // cout << "you are using float gemm routine" << endl;
+
+  enum CBLAS_ORDER order = CblasRowMajor;  
+  enum CBLAS_TRANSPOSE btransa,btransb;
+
+  btransa = ( (transa=='N')||(transa=='n') ) ? CblasNoTrans : CblasTrans;
+  btransb = ( (transb=='N')||(transb=='n') ) ? CblasNoTrans : CblasTrans;
+
+  int M = ( (transa=='N')||(transa=='n') ) ? a.nrow : a.ncol;
+  int N = ( (transb=='N')||(transb=='n') ) ? b.ncol : b.nrow;
+  int K = ( (transa=='N')||(transa=='n') ) ? a.ncol : a.nrow;
+  int Kcheck = ( (transb=='N')||(transb=='n') ) ? b.nrow : b.ncol;
+
+  matrix<float> result(M,N);
+
+  if ( (K != Kcheck) )
+    _ERROR_("incompatible matrices",result);
+
+  int LDA = ( (transa=='N')||(transa=='n') ) ? K : M;
+  int LDB = ( (transb=='N')||(transb=='n') ) ? N : K;
+  int LDC = N;
+
   float ALPHA = 1.0, BETA = 0.0;
 
-  cblas_sgemm( order, transa, transb, M, N, K, ALPHA, a.pointer, LDA, b.pointer, LDB,BETA, result.pointer, LDC );
+
+  cblas_sgemm( order, btransa, btransb, M, N, K, ALPHA, a.pointer, LDA, b.pointer, LDB,BETA, result.pointer, LDC );
   
   return result;
 }
 
 
 template <>
-matrix<double> operator*(const matrix<double> &a,const matrix<double> &b)
+matrix<double> gemm( const matrix<double> &a, const char transa, const matrix<double> &b, const char transb)
 {
-  cout << "you are using float cblas routine";
+
+  // cout << "you are using double gemm routine" << endl;
+
+  enum CBLAS_ORDER order = CblasRowMajor;  
+  enum CBLAS_TRANSPOSE btransa,btransb;
+
+  btransa = ( (transa=='N')||(transa=='n') ) ? CblasNoTrans : CblasTrans;
+  btransb = ( (transb=='N')||(transb=='n') ) ? CblasNoTrans : CblasTrans;
+
+  int M = ( (transa=='N')||(transa=='n') ) ? a.nrow : a.ncol;
+  int N = ( (transb=='N')||(transb=='n') ) ? b.ncol : b.nrow;
+  int K = ( (transa=='N')||(transa=='n') ) ? a.ncol : a.nrow;
+  int Kcheck = ( (transb=='N')||(transb=='n') ) ? b.nrow : b.ncol;
+
+  matrix<double> result(M,N);
+
+  if ( (K != Kcheck) )
+    _ERROR_("incompatible matrices",result);
+
+  int LDA = ( (transa=='N')||(transa=='n') ) ? K : M;
+  int LDB = ( (transb=='N')||(transb=='n') ) ? N : K;
+  int LDC = N;
+
+  double ALPHA = 1.0, BETA = 0.0;
+
+  cblas_dgemm( order, btransa, btransb, M, N, K, ALPHA, a.pointer, LDA, b.pointer, LDB,BETA, result.pointer, LDC );
+  
+  return result;
 }
 
 
 template <>
-matrix< complex<float> > operator*(const matrix< complex<float> > &c1,const matrix< complex<float> > &c2)
+matrix< complex<float> > gemm( const matrix< complex<float> > &a, const char transa, const matrix< complex<float> > &b, const char transb )
 {
-  cout << "you are using float cblas routine";
+  // cout << "you are using complex float gemm routine" << endl;
+
+  enum CBLAS_ORDER order = CblasRowMajor;  
+  enum CBLAS_TRANSPOSE btransa,btransb;
+
+  if ( ( (transa=='N')||(transa=='n') ) )
+    btransa = CblasNoTrans;
+  else if ( ( (transa=='T')||(transa=='t') ) )
+    btransa = CblasTrans;
+  else
+    btransa = CblasConjTrans;
+
+  if ( ( (transb=='N')||(transb=='n') ) )
+    btransb = CblasNoTrans;
+  else if ( ( (transb=='T')||(transb=='t') ) )
+    btransb = CblasTrans;
+  else
+    btransb = CblasConjTrans;
+
+  int M = ( (transa=='N')||(transa=='n') ) ? a.nrow : a.ncol;
+  int N = ( (transb=='N')||(transb=='n') ) ? b.ncol : b.nrow;
+  int K = ( (transa=='N')||(transa=='n') ) ? a.ncol : a.nrow;
+  int Kcheck = ( (transb=='N')||(transb=='n') ) ? b.nrow : b.ncol;
+
+  matrix< complex<float> > result(M,N);
+  if ( (K != Kcheck) )
+    _ERROR_("incompatible matrices",result);
+
+  int LDA = ( (transa=='N')||(transa=='n') ) ? K : M;
+  int LDB = ( (transb=='N')||(transb=='n') ) ? N : K;
+  int LDC = N;
+
+  complex<float> ALPHA = 1.0, BETA = 0.0;
+
+  cblas_cgemm( order, btransa, btransb, M, N, K, &ALPHA, a.pointer, LDA, b.pointer, LDB,&BETA, result.pointer, LDC );
+  
+  return result;
 }
 
 
 template <>
-matrix< complex<double> > operator*(const matrix< complex<double> > &c1,const matrix< complex<double> > &c2)
+matrix< complex<double> > gemm( const matrix< complex<double> > &a, const char transa, const matrix< complex<double> > &b, const char transb )
 {
-  cout << "you are using float cblas routine";
+  //  cout << "you are using complex double gemm routine" << endl;
+
+  enum CBLAS_ORDER order = CblasRowMajor;  
+  enum CBLAS_TRANSPOSE btransa,btransb;
+
+  if ( ( (transa=='N')||(transa=='n') ) )
+    btransa = CblasNoTrans;
+  else if ( ( (transa=='T')||(transa=='t') ) )
+    btransa = CblasTrans;
+  else
+    btransa = CblasConjTrans;
+
+  if ( ( (transb=='N')||(transb=='n') ) )
+    btransb = CblasNoTrans;
+  else if ( ( (transb=='T')||(transb=='t') ) )
+    btransb = CblasTrans;
+  else
+    btransb = CblasConjTrans;
+
+  int M = ( (transa=='N')||(transa=='n') ) ? a.nrow : a.ncol;
+  int N = ( (transb=='N')||(transb=='n') ) ? b.ncol : b.nrow;
+  int K = ( (transa=='N')||(transa=='n') ) ? a.ncol : a.nrow;
+  int Kcheck = ( (transb=='N')||(transb=='n') ) ? b.nrow : b.ncol;
+
+  matrix< complex<double> > result(M,N);
+  if ( (K != Kcheck) )
+    _ERROR_("incompatible matrices", result);
+
+  int LDA = ( (transa=='N')||(transa=='n') ) ? K : M;
+  int LDB = ( (transb=='N')||(transb=='n') ) ? N : K;
+  int LDC = N;
+
+  complex<double> ALPHA = 1.0, BETA = 0.0;
+
+  cblas_zgemm( order, btransa, btransb, M, N, K, &ALPHA, a.pointer, LDA, b.pointer, LDB,&BETA, result.pointer, LDC );
+
+  return result;
 }
+
 #endif

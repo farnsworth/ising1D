@@ -28,11 +28,19 @@ public:
   matrix( int,int );
   matrix(const matrix<T>& source); /*< copy constructor */
   ~matrix();
-  void print();
+  void print() const;
 
-  T& operator() ( const int, const int );
+  T& operator() ( const int, const int ) const;
   matrix<T>& operator=( const matrix<T> &source);
   matrix<T>& operator=(const T);
+
+  T* diagonalize( bool evect=false );
+  T det();
+  matrix<T> transpose() const;
+  matrix<T> conjugate() const;
+  matrix<T> daga() const;
+  int get_nrow() const;
+  int get_ncol() const;
 
   template <class T2> friend ostream& operator<<( ostream& , const matrix<T2> & );
   template <class T2> friend matrix<T2> operator+(const matrix<T2> &, const matrix<T2> &);
@@ -41,17 +49,11 @@ public:
   template <class T2> friend matrix<T2> operator*(const matrix<T2> &, const T2 );
   template <class T2> friend matrix<T2> operator*(const T2 , const matrix<T2> &);
 
-  template <class T2> friend matrix< complex<T2> > operator*(const matrix< complex<T2> > &c1, const matrix<T2> &c2);
 
-  template <class T2> friend matrix< complex<T2> > operator*(const matrix<T2> &c1, const matrix< complex<T2> > &c2);
+  template <class T2> friend matrix<T2> gemm( const matrix<T2> &a, const char trana, const matrix<T2> &b, const char tranb);
+  template <class T2> friend matrix< complex<T2> > gemm(const matrix< complex<T2> > &a, const char trana, const matrix<T2> &b, const char tranb);
+  template <class T2> friend matrix< complex<T2> > gemm(const matrix<T2> &a, const char trana, const matrix< complex<T2> > &b, const char tranb);
 
-  T* diagonalize( bool evect=false );
-  T det();
-  matrix<T> transpose();
-  matrix<T> conjugate();
-  matrix<T> daga();
-  int get_nrow() const;
-  int get_ncol() const;
 
 private:
   T* pointer;
@@ -59,6 +61,16 @@ private:
   int ncol;
   int index( const int irow, const int icol ) const;
 };
+
+template<class T>
+matrix<T> gemm( const matrix<T> &a, const char trana, const matrix<T> &b, const char tranb );
+
+template<class T>
+matrix< complex<T> > gemm( const matrix< complex<T> > &a, const char trana, const matrix<T> &b, const char tranb );
+
+template<class T>
+matrix< complex<T> > gemm( const matrix<T> &a, const char trana, const matrix< complex<T> > &b, const char tranb );
+
 
 #include "matrices.hpp"
 
