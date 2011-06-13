@@ -1,0 +1,5 @@
+run 8:
+it does a calculation of:
+2 - \rho^xx_(i,r) with i at the center
+    and r 1,2,3,4,5
+as a function of time and GGE averages
