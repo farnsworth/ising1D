@@ -271,14 +271,20 @@ T* matrix<T>::diagonalize( bool evect)
 template <class T>
 T matrix<T>::det()
 {
-  _ERROR_("determinant is not yet implemented for this kind of matrices",);
+  _ERROR_("determinant is not yet implemented for this kind of matrices",0);
 }
+
+template<>
+float* matrix<float>::diagonalize( bool evect );
 
 template<>
 double* matrix<double>::diagonalize( bool evect );
 
 template <>
 matrix< complex<double> > matrix< complex<double> >::conjugate() const;
+
+template<>
+float matrix<float>::det();
 
 template<>
 double matrix<double>::det();

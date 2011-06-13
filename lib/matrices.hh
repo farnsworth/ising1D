@@ -16,8 +16,10 @@
 #endif
 using namespace std;
 
+extern "C" void ssyev_(char *, char *, int *, float *, int *, float *, float *, int *, int * );
 extern "C" void dsyev_(char *, char *, int *, double *, int *, double *, double *, int *, int * );
 extern "C" void dsyevd_(char *, char *, int *, double *, int *, double *, double *, int *, int*, int*, int*);
+extern "C" void sgetrf_(int *,int *, float *, int *, int *, int * );
 extern "C" void dgetrf_(int *,int *, double *, int *, int *, int * );
 extern "C" void zgetrf_(int *,int *, complex<double> *, int *, int *, int * );
 

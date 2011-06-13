@@ -4,6 +4,34 @@
 #include <iostream>
 
 template <>
+float matrix<float>::det( )
+{
+  if (nrow != ncol){
+    _ERROR_("you are trying to compute the determiant of a non square matrix",0.0);
+    return 0.0;
+  }
+  int lda = ncol;
+  int info;
+  int sign = 0;
+  int* pivot = new int[ncol];
+  float result = 1.0;
+
+  sgetrf_( &ncol, &ncol , pointer, &lda, pivot, &info );
+  
+  for (int i=0;i<ncol;++i){
+    result = result*(*this)(i,i);
+    /* the index start from 1 and not from 0 */
+    if ( pivot[i] != i+1) ++sign;
+  }
+
+  result = (sign%2 == 0) ? result : -result;
+
+  delete [] pivot;
+  return result;
+}
+
+
+template <>
 double matrix<double>::det( )
 {
   if (nrow != ncol){
@@ -57,6 +85,38 @@ complex<double> matrix< complex<double> >::det( )
 
 
 #ifdef USUAL_ALG
+template <>
+float* matrix<float>::diagonalize( bool evect )
+{
+  if (nrow != ncol)
+    _ERROR_("you are trying to diagonalize a non square matrix",NULL);
+
+  float* eigenvalues = new float[nrow];
+
+  char jobz = (evect) ? 'V': 'N';
+  char uplo = 'U';
+  int lda = ncol;
+  int info;
+  //  int lwork = 3*ncol-1;
+  //int lwork = 3*ncol-1;
+  //double* work = new double[lwork];
+  // change pointer because it destroy the initial matrix
+
+  int temp = -1;
+  float twork;
+  ssyev_( &jobz, &uplo, &ncol, pointer, &lda, eigenvalues , &twork, &temp, &info );
+
+  int lwork = int(twork);
+  float* work = new float[lwork];
+
+  ssyev_( &jobz, &uplo, &ncol, pointer, &lda, eigenvalues , work, &lwork, &info );
+
+  delete [] work;
+  return eigenvalues;
+}
+
+
+
 template <>
 double* matrix<double>::diagonalize( bool evect )
 {
