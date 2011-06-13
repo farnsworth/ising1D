@@ -8,9 +8,9 @@
 #include <string>
 using namespace std;
 
-double fermi_dist(double energy, double temp)
+FPType fermi_dist(FPType energy,FPType temp)
 {
-  double beta = 1/temp;
+  FPType beta = 1/temp;
   return 1.0/(exp(beta*energy)+1.0);
 }
 

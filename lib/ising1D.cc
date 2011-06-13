@@ -14,25 +14,25 @@
 using namespace std;
 
 
-energy::energy(double * data,int size_in) : local_obs<double>( data,size_in ){
+energy::energy(FPType * data,int size_in) : local_obs<FPType>( data,size_in ){
 }
 
 
-double energy::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType energy::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return 0.0;
 }
 
-localtmag::localtmag(int site, ising1D * system_in) : local_obs<double>( system_in->get_size() ){
+localtmag::localtmag(int site, ising1D * system_in) : local_obs<FPType>( system_in->get_size() ){
   _system = system_in;
   _site = site;
 }
 
 
-double localtmag::_get_time_evolution(int site, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType localtmag::_get_time_evolution(int site, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   int size = UUt->get_ncol();
-  double temp = 0.0;
+  FPType temp = 0.0;
   
   for (int icol=0;icol<size;++icol)
     temp += norm( (*VVt)(site,icol) );
@@ -41,7 +41,7 @@ double localtmag::_get_time_evolution(int site, matrix< complex<double> > *UUt, 
 }
 
 
-double localtmag::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType localtmag::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return _get_time_evolution( _site, UUt, VVt );
 }
@@ -49,7 +49,7 @@ double localtmag::get_time_evolution( matrix< complex<double> > *UUt, matrix< co
 
 void localtmag::set_spvs()
 {
-  _spvs = new double[_size];
+  _spvs = new FPType[_size];
   
   _gsv = -1.0;
   for (int mu=0;mu<_size;++mu){
@@ -60,17 +60,17 @@ void localtmag::set_spvs()
 
 
 /********* to modify ************/
-cidagacj::cidagacj(int i, int j, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
+cidagacj::cidagacj(int i, int j, ising1D * system_in) : local_obs< complex<FPType> >( system_in->get_size() ){
   _system = system_in;
   _i = i;
   _j = j;
 }
 
 
-complex<double> cidagacj::_get_time_evolution(int i,int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+complex<FPType> cidagacj::_get_time_evolution(int i,int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   int size = UUt->get_ncol();
-  complex<double> temp = 0.0;
+  complex<FPType> temp = 0.0;
   
   for (int icol=0;icol<size;++icol)
     temp += (*VVt)(i,icol) * conj( (*VVt)(j,icol) );
@@ -79,7 +79,7 @@ complex<double> cidagacj::_get_time_evolution(int i,int j, matrix< complex<doubl
 }
 
 
-complex<double> cidagacj::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+complex<FPType> cidagacj::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return _get_time_evolution( _i,_j, UUt, VVt );
 }
@@ -87,7 +87,7 @@ complex<double> cidagacj::get_time_evolution( matrix< complex<double> > *UUt, ma
 
 void cidagacj::set_spvs()
 {
-  _spvs = new double[_size];
+  _spvs = new FPType[_size];
   
   _gsv = 0.0;
   for (int mu=0;mu<_size;++mu){
@@ -106,26 +106,26 @@ void cidagacj::set_spvs()
 
 
 
-tmag::tmag(ising1D * system_in) : local_obs<double>( system_in->get_size() ){
+tmag::tmag(ising1D * system_in) : local_obs<FPType>( system_in->get_size() ){
   _system = system_in;
 }
 
 
-double tmag::_get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType tmag::_get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   int size = UUt->get_ncol();
-  double temp = 0.0;
+  FPType temp = 0.0;
   
   for (int irow=0;irow<size;++irow)
     for (int icol=0;icol<size;++icol)
       //      temp += pow( abs( (*VVt)(irow,icol) ),2);
       temp += norm( (*VVt)(irow,icol) );
   
-  return 2.0*temp-double(size);
+  return 2.0*temp-FPType(size);
 }
 
 
-double tmag::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType tmag::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return _get_time_evolution( UUt, VVt );
 }
@@ -133,7 +133,7 @@ double tmag::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex
 
 void tmag::set_spvs()
 {
-  _spvs = new double[_size];
+  _spvs = new FPType[_size];
   
   for (int mu=0;mu<_size;++mu){
     _spvs[mu] = 0.0;
@@ -145,7 +145,7 @@ void tmag::set_spvs()
 }
 
 
-BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< double >( system_in->get_size() ){
+BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< FPType >( system_in->get_size() ){
   if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
     _ERROR_("indexes outside the chain",);
   }
@@ -155,17 +155,17 @@ BiAj::BiAj(int i_in, int j_in, ising1D * system_in) : local_obs< double >( syste
 }
 
 
-double BiAj::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType BiAj::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return _get_time_evolution(_i,_j,UUt,VVt );
 }
 
 
-double BiAj::_get_time_evolution( int i, int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType BiAj::_get_time_evolution( int i, int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   int size = UUt->get_ncol();
-  complex<double> temp1,temp2;
-  double temp;
+  complex<FPType> temp1,temp2;
+  FPType temp;
   
   if (i==j)
     temp = -1.0;
@@ -184,8 +184,8 @@ double BiAj::_get_time_evolution( int i, int j, matrix< complex<double> > *UUt, 
 
 void BiAj::set_spvs()
 {
-  _spvs = new double[_size];
-  double temp1,temp2;
+  _spvs = new FPType[_size];
+  FPType temp1,temp2;
   
   for (int imu=0;imu<_size;++imu){
     temp1 = (*_system->UU)(_i,imu) - (*_system->VV)(_i,imu);
@@ -196,7 +196,7 @@ void BiAj::set_spvs()
 }
 
 
-AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
+AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<FPType> >( system_in->get_size() ){
   if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
     _ERROR_("indexes outside the chain",);
   }
@@ -206,18 +206,18 @@ AiAj::AiAj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double>
 }
 
 
-complex<double> AiAj::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+complex<FPType> AiAj::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return _get_time_evolution(_i,_j,UUt,VVt );
 }
 
 
-complex<double> AiAj::_get_time_evolution( int i, int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+complex<FPType> AiAj::_get_time_evolution( int i, int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   int size = UUt->get_ncol();
-  complex<double> temp,temp1,temp2;
+  complex<FPType> temp,temp1,temp2;
   
-  temp = complex<double>(0.0,0.0);
+  temp = complex<FPType>(0.0,0.0);
 
   for (int imu=0;imu<size;++imu){
     temp1 = (*VVt)(i,imu) + (*UUt)(i,imu);
@@ -231,7 +231,7 @@ complex<double> AiAj::_get_time_evolution( int i, int j, matrix< complex<double>
 
 void AiAj::set_spvs()
 {
-  _spvs = new double[_size];
+  _spvs = new FPType[_size];
   for (int imu=0;imu<_size;++imu)
     _spvs[imu] = 0.0;
   set_gsv();
@@ -241,13 +241,13 @@ void AiAj::set_spvs()
 void AiAj::set_gsv()
 {
   if (_i==_j)
-    _gsv=1.0*double(_size);
+    _gsv=1.0*FPType(_size);
   else
     _gsv=0.0;
 }
 
 
-BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double> >( system_in->get_size() ){
+BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<FPType> >( system_in->get_size() ){
   if ((i_in < 0) || (j_in < 0) || (i_in > system_in->get_size()) || (j_in > system_in->get_size()) ){
     _ERROR_("indexes outside the chain",);
   }
@@ -257,18 +257,18 @@ BiBj::BiBj(int i_in, int j_in, ising1D * system_in) : local_obs< complex<double>
 }
 
 
-complex<double> BiBj::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+complex<FPType> BiBj::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   return _get_time_evolution(_i,_j,UUt,VVt );
 }
 
 
-complex<double> BiBj::_get_time_evolution( int i, int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+complex<FPType> BiBj::_get_time_evolution( int i, int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
   int size = UUt->get_ncol();
-  complex<double> temp,temp1,temp2;
+  complex<FPType> temp,temp1,temp2;
   
-  temp = complex<double>(0.0,0.0);
+  temp = complex<FPType>(0.0,0.0);
 
   for (int imu=0;imu<size;++imu){
     temp1 = (*VVt)(i,imu) - (*UUt)(i,imu);
@@ -281,7 +281,7 @@ complex<double> BiBj::_get_time_evolution( int i, int j, matrix< complex<double>
 
 void BiBj::set_spvs()
 {
-  _spvs = new double[_size];
+  _spvs = new FPType[_size];
   for (int imu=0;imu<_size;++imu)
     _spvs[imu] = 0.0;
   set_gsv();
@@ -290,13 +290,13 @@ void BiBj::set_spvs()
 void BiBj::set_gsv()
 {
   if (_i==_j)
-    _gsv=-1.0*double(_size);
+    _gsv=-1.0*FPType(_size);
   else
     _gsv=0.0;
 }
 
 
-rho::rho( int i,int r, ising1D * system) : obs<double>( system->get_size())
+rho::rho( int i,int r, ising1D * system) : obs<FPType>( system->get_size())
 {
   if ((i+r > system->get_size()) || (i < 0)){
     _ERROR_("indexes outside the chain",);
@@ -311,7 +311,7 @@ rho::rho( int i,int r, ising1D * system) : obs<double>( system->get_size())
 }
 
 
-rho::rho(const rho& source) : obs<double>( source )
+rho::rho(const rho& source) : obs<FPType>( source )
 {
   /* ATTENTION */
   /* they point to the same system and same _BiAjmatrix elements (not matrix) */
@@ -331,12 +331,12 @@ rho::rho(const rho& source) : obs<double>( source )
   if (source._reduced_matrix == NULL)
     _reduced_matrix = NULL;
   else
-    _reduced_matrix = new matrix<double>( *(source._reduced_matrix) );
+    _reduced_matrix = new matrix<FPType>( *(source._reduced_matrix) );
 
   if (source._full_matrix == NULL)
     _full_matrix = NULL;
   else
-    _full_matrix = new matrix< complex<double> >( *(source._full_matrix));
+    _full_matrix = new matrix< complex<FPType> >( *(source._full_matrix));
 }
 
 
@@ -352,9 +352,9 @@ void rho::set_BiAjpointers()
 }
 
 
-void rho::set_ensemble_average(double* nk)
+void rho::set_ensemble_average(FPType* nk)
 {
-  _reduced_matrix = new matrix<double>(_r,_r);
+  _reduced_matrix = new matrix<FPType>(_r,_r);
   
   for( int irow=0;irow<_r;++irow)
     for ( int icol=0;icol<_r;++icol)
@@ -362,13 +362,13 @@ void rho::set_ensemble_average(double* nk)
 }
 
 
-double rho::get_ensemble_average(int l)
+FPType rho::get_ensemble_average(int l)
 {
   if (l<0) l=_r;
   if (l>_r) _ERROR_("distance greater than the initialized one",0.0);
  
-  matrix<double> temp(l,l);
-  double result;
+  matrix<FPType> temp(l,l);
+  FPType result;
 
   for( int irow=0;irow<l;++irow)
     for ( int icol=0;icol<l;++icol)
@@ -379,16 +379,16 @@ double rho::get_ensemble_average(int l)
   return result;
 }
 
-double rho::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt )
+FPType rho::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt )
 {
   _ERROR_("wrong use of rho object",0.0);
 }
 
-void rho::set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt ){
+void rho::set_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt ){
   int i,j;
-  _full_matrix = new matrix<complex<double> >(2*_r,2*_r);
+  _full_matrix = new matrix<complex<FPType> >(2*_r,2*_r);
   
-  *_full_matrix = complex<double>(0.0,0.0);
+  *_full_matrix = complex<FPType>(0.0,0.0);
   for (int irow=0;irow<2*_r;++irow){
 
     if (irow%2 == 0)
@@ -406,10 +406,10 @@ void rho::set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<do
 	(*_full_matrix)(irow,icol) = BiBj::_get_time_evolution(i,j,UUt,VVt);
       }
       if ((irow%2 == 0)&&(icol%2 == 1)){
-	(*_full_matrix)(irow,icol) = complex<double>(1.0,0.0)*BiAj::_get_time_evolution(i,j,UUt,VVt);
+	(*_full_matrix)(irow,icol) = complex<FPType>(1.0,0.0)*BiAj::_get_time_evolution(i,j,UUt,VVt);
       }
       if ((irow%2 == 1)&&(icol%2 == 0)){
-	(*_full_matrix)(irow,icol) = complex<double>(-1.0,0.0)*BiAj::_get_time_evolution(j,i,UUt,VVt);
+	(*_full_matrix)(irow,icol) = complex<FPType>(-1.0,0.0)*BiAj::_get_time_evolution(j,i,UUt,VVt);
       }
       if ((irow%2 == 1)&&(icol%2 == 1)){
 	(*_full_matrix)(irow,icol) = AiAj::_get_time_evolution(i,j,UUt,VVt);
@@ -422,13 +422,13 @@ void rho::set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<do
 
 
 
-double rho::get_time_evolution(int l)
+FPType rho::get_time_evolution(int l)
 {
   if (l<0) l=_r;
   if (l>_r) _ERROR_("distance greater than the initialized one",0.0);
  
-  matrix< complex<double> > temp(2*l,2*l);
-  complex<double> tResult;
+  matrix< complex<FPType> > temp(2*l,2*l);
+  complex<FPType> tResult;
 
   for( int irow=0;irow<2*l;++irow)
     for ( int icol=0;icol<2*l;++icol)
@@ -457,7 +457,7 @@ rho::~rho()
 
 
 
-rhozz::rhozz( int i,int r, ising1D * system) : obs<double>( system->get_size())
+rhozz::rhozz( int i,int r, ising1D * system) : obs<FPType>( system->get_size())
 {
   if ((i+r > system->get_size()) || (i < 0)){
     _ERROR_("indexes outside the chain",);
@@ -483,9 +483,9 @@ void rhozz::set_ensemble_average()
   _BlBm->set_spvs();
 }
 
-double rhozz::get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt )
+FPType rhozz::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt )
 {
-  double result;
+  FPType result;
   
   result = _BlAl->get_time_evolution(UUt,VVt)* _BmAm->get_time_evolution(UUt,VVt);
   result -= _BmAl->get_time_evolution(UUt,VVt)* _BlAm->get_time_evolution(UUt,VVt);
@@ -496,9 +496,9 @@ double rhozz::get_time_evolution( matrix< complex<double> > *UUt, matrix< comple
 
 
 
-double rhozz::get_ensemble_average( double *nk )
+FPType rhozz::get_ensemble_average( FPType *nk )
 {
-  double result;
+  FPType result;
   
   result = _BlAl->get_ensemble_average(nk) * _BmAm->get_ensemble_average(nk);
   result -= _BmAl->get_ensemble_average(nk) * _BlAm->get_ensemble_average(nk);
@@ -522,7 +522,7 @@ rhozz::~rhozz()
 
 
 
-ising1D::ising1D( in_file* file, const string name, double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*) )
+ising1D::ising1D( in_file* file, const string name, FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*) )
 {
   size = _SIZE_;
   _h = _H_;
@@ -540,7 +540,7 @@ ising1D::ising1D( in_file* file, const string name, double (*JJgen)(int,ising1D*
 }
 
 
-ising1D::ising1D(int size_in, double h, double J, double epsilon, double gamma, bool pbc, int seed)
+ising1D::ising1D(int size_in, FPType h, FPType J, FPType epsilon, FPType gamma, bool pbc, int seed)
 {
   size = size_in;
   _J = J;
@@ -557,7 +557,7 @@ ising1D::ising1D(int size_in, double h, double J, double epsilon, double gamma, 
 }
 
 
-void ising1D::init( double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
+void ising1D::init( FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*))
 {
   if (size<1)
     _ERROR_("Non valid value of size",);
@@ -568,17 +568,17 @@ void ising1D::init( double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
   if (_pbc)
     _MESSAGE_("You are using PBC");
 
-  _hamiltonian = new matrix<double>(2*size,2*size);
+  _hamiltonian = new matrix<FPType>(2*size,2*size);
 
   if (_seed < 0)
     _seed = time(NULL);
 
   rand_init( &_seed );
   
-  UU = new matrix<double>(size,size);
-  VV = new matrix<double>(size,size);
-  _JJ = new double[size];
-  _hh = new double[size];
+  UU = new matrix<FPType>(size,size);
+  VV = new matrix<FPType>(size,size);
+  _JJ = new FPType[size];
+  _hh = new FPType[size];
 
   if (_from_center){
     _MESSAGE_("Disorder is generated from the center of the chain");
@@ -615,12 +615,12 @@ void ising1D::init( double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
 
 
 
-double randomHH(int i, ising1D* system){
+FPType randomHH(int i, ising1D* system){
   return system->get_h() * (1.0 + 2.0*system->get_epsilon()*(drand1()-0.5));
 }
 
 
-double randomJJ(int i, ising1D* system){
+FPType randomJJ(int i, ising1D* system){
   return system->get_J() * (1.0 + 2.0*system->get_epsilon()*(drand1()-0.5));
 }
 
@@ -630,17 +630,17 @@ int ising1D::get_size()
   return size;
 }
 
-double ising1D::get_J()
+FPType ising1D::get_J()
 {
   return _J;
 }
 
-double ising1D::get_h()
+FPType ising1D::get_h()
 {
   return _h;
 }
 
-double ising1D::get_epsilon()
+FPType ising1D::get_epsilon()
 {
   return _epsilon;
 }
@@ -648,9 +648,9 @@ double ising1D::get_epsilon()
 
 void ising1D::solve_diagonalization()
 {
-  double * tempeigenval = new double[2*size];
-  double * eigenval = new double[size];
-  matrix<double> temph(2*size,2*size);
+  FPType * tempeigenval = new FPType[2*size];
+  FPType * eigenval = new FPType[size];
+  matrix<FPType> temph(2*size,2*size);
 
   temph = get_hamiltonian();
 
@@ -684,11 +684,11 @@ void ising1D::solve_diagonalization()
   return;
 }
 
-void ising1D::check( double* eigenval,  matrix<double> * eigvect )
+void ising1D::check( FPType* eigenval,  matrix<FPType> * eigvect )
 {
   bool docor = false;
   int size = eigvect->get_ncol()/2;
-  double temp;
+  FPType temp;
 
   for (int irow=0;irow<size;++irow)
     for (int icol=0;icol<size;++icol){
@@ -716,10 +716,10 @@ void ising1D::check( double* eigenval,  matrix<double> * eigvect )
     
   if (docor){
     _WARNING_("manual correction of eigenvectors");
-    double gamma = ( (*eigvect)(size-1,size) + (*eigvect)(size,0) ) / ( (*eigvect)(size,size) - (*eigvect)(size-1,0) );
-    double beta = 1.0/sqrt(1.0+gamma*gamma);
-    double alpha = gamma*beta;
-    double temp1,temp2;
+    FPType gamma = ( (*eigvect)(size-1,size) + (*eigvect)(size,0) ) / ( (*eigvect)(size,size) - (*eigvect)(size-1,0) );
+    FPType beta = 1.0/sqrt(1.0+gamma*gamma);
+    FPType alpha = gamma*beta;
+    FPType temp1,temp2;
     for (int i=0;i<2*size;++i){
       temp1 = (*eigvect)(size-1,i);
       temp2 = (*eigvect)(size,i);
@@ -731,7 +731,7 @@ void ising1D::check( double* eigenval,  matrix<double> * eigvect )
     temp1 = 0.0;
     temp2 = 0.0;
     for (int j=0;j<2*size;++j){
-      double t1=0.0,t2=0.0;
+      FPType t1=0.0,t2=0.0;
       for (int i=0;i<2*size;++i){
 	t1 += (*_hamiltonian)(j,i) * (*eigvect)(size-1,i);
 	t2 += (*_hamiltonian)(j,i) * (*eigvect)(size,i);
@@ -740,7 +740,7 @@ void ising1D::check( double* eigenval,  matrix<double> * eigvect )
       temp2 += t2*(*eigvect)(size,j);
     }
 
-    double temp;
+    FPType temp;
     if ( temp1>0 ){
       // inversion of the eigenvectors
       eigenval[size-1] = temp2;
@@ -759,11 +759,11 @@ void ising1D::check( double* eigenval,  matrix<double> * eigvect )
 }
 
 
-matrix<double> ising1D::get_hamiltonian()
+matrix<FPType> ising1D::get_hamiltonian()
 {
-  matrix<double> AA(size,size);
-  matrix<double> BB(size,size);
-  matrix<double> result(2*size,2*size);
+  matrix<FPType> AA(size,size);
+  matrix<FPType> BB(size,size);
+  matrix<FPType> result(2*size,2*size);
 
   AA = get_matrix_A();
   BB = get_matrix_B();
@@ -784,9 +784,9 @@ matrix<double> ising1D::get_hamiltonian()
 }
 
 
-matrix<double> ising1D::get_matrix_A()
+matrix<FPType> ising1D::get_matrix_A()
 {
-  matrix<double>  AA(size,size);
+  matrix<FPType>  AA(size,size);
   
   AA = 0.0;
   
@@ -810,11 +810,11 @@ matrix<double> ising1D::get_matrix_A()
 }
 
 
-matrix<double> ising1D::get_matrix_B()
+matrix<FPType> ising1D::get_matrix_B()
 {
-  matrix<double> BB(size,size);
-  //double temp = (1.0-gamma)/2.0;
-  double temp = _gamma/2.0;
+  matrix<FPType> BB(size,size);
+  //FPType temp = (1.0-gamma)/2.0;
+  FPType temp = _gamma/2.0;
   
   BB = 0.0;
   
@@ -910,7 +910,7 @@ void ising1D::read( in_file* file,const string systemname)
 }
 
 
-quench::quench( int size_in, double h0, double h, double J, double epsilon, double gamma, bool pbc)
+quench::quench( int size_in, FPType h0, FPType h, FPType J, FPType epsilon, FPType gamma, bool pbc)
 {
   system0 = new ising1D(size_in, h0, J, epsilon, gamma, pbc);
   system = new ising1D(size_in, h,  J, epsilon, gamma, pbc);
@@ -930,7 +930,7 @@ quench::~quench()
 }
 
 
-quench::quench( in_file* file,double (*JJgen0)(int,ising1D*),double (*HHgen0)(int,ising1D*),double (*JJgen)(int,ising1D*),double (*HHgen)(int,ising1D*))
+quench::quench( in_file* file,FPType (*JJgen0)(int,ising1D*),FPType (*HHgen0)(int,ising1D*),FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*))
 {
   system0 = new ising1D(file,"system0",JJgen0,HHgen0);
   system = new ising1D(file,"system",JJgen,HHgen);
@@ -945,8 +945,8 @@ void quench::init()
 {
   size = system->size;
   gge = NULL;
-  UUt = new matrix< complex<double> >(size,size);
-  VVt = new matrix< complex<double> >(size,size);
+  UUt = new matrix< complex<FPType> >(size,size);
+  VVt = new matrix< complex<FPType> >(size,size);
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
@@ -961,8 +961,8 @@ int quench::get_size()
 
 void quench::set_gge_occupations()
 {
-  matrix<double> temp(size,size);
-  gge = new double[size];
+  matrix<FPType> temp(size,size);
+  gge = new FPType[size];
   
   // modified
   //  temp = system->UU->transpose()* *(system0->VV) + system->VV->transpose()* *(system0->UU);
@@ -980,12 +980,12 @@ void quench::set_gge_occupations()
 }
 
 
-void quench::set_time_evolution( const double time, matrix<complex<double> > * UU, matrix<complex<double> > * VV )
+void quench::set_time_evolution( const FPType time, matrix<complex<FPType> > * UU, matrix<complex<FPType> > * VV )
 {
-  matrix< complex<double> > te = get_evolution_matrix(time);
-  matrix< complex<double> > tec = te.conjugate();
-  matrix< complex<double> > AA(size,size);
-  matrix< complex<double> > BB(size,size);
+  matrix< complex<FPType> > te = get_evolution_matrix(time);
+  matrix< complex<FPType> > tec = te.conjugate();
+  matrix< complex<FPType> > AA(size,size);
+  matrix< complex<FPType> > BB(size,size);
   
   /* we can optimize this part */
 
@@ -1010,20 +1010,21 @@ void quench::set_time_evolution( const double time, matrix<complex<double> > * U
 #endif
 }
 
-void quench::set_time_evolution( const double time )
+void quench::set_time_evolution( const FPType time )
 {
   set_time_evolution(time, UUt,VVt);
 }
 
 
-matrix< complex<double> > quench::get_evolution_matrix( const double time )
+matrix< complex<FPType> > quench::get_evolution_matrix( const FPType time )
 {
-  matrix< complex<double> > temp(size,size);
-  complex<double> imath(0.0,1.0);
+  matrix< complex<FPType> > temp(size,size);
+  complex<FPType> imath(0.0,1.0);
+  FPType two=2.0;
   
-  temp = complex<double>(0.0,0.0);
+  temp = complex<FPType>(0.0,0.0);
   for (int i=0;i<size;++i)
-      temp(i,i) = exp(- 2.0*system->e->get_spv(i) * time * imath );
+    temp(i,i) = exp(- two*system->e->get_spv(i) * time * imath );
 
 #ifdef DEBUG
   _ERROR_TRACKING_;
@@ -1031,9 +1032,9 @@ matrix< complex<double> > quench::get_evolution_matrix( const double time )
   return temp;
 }
 
-double quench::get_calpha2( state* s)
+FPType quench::get_calpha2( state* s)
 {
-  matrix<double> u1(size,size),v1(size,size),temp(size,size);
+  matrix<FPType> u1(size,size),v1(size,size),temp(size,size);
  
   for (int icol=0;icol<size;++icol){
     if (s->conf[icol]){

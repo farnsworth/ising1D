@@ -19,7 +19,7 @@ local_obs<T>::local_obs( int size_in) : obs<T>(size_in)
 }
 
 template<class T>
-local_obs<T>::local_obs( double* val, int size_in) : obs<T>(size_in)
+local_obs<T>::local_obs( FPType* val, int size_in) : obs<T>(size_in)
 {
   this->_spvs = new T[this->_size];
   this->_gsv = 0.0;
@@ -56,16 +56,16 @@ void local_obs<T>::set_gsv()
 }
 
 template<class T>
-double local_obs<T>::get_spv(int num)
+FPType local_obs<T>::get_spv(int num)
 {
   return _spvs[num];
 }
 
 
 template<class T>
-double local_obs<T>::get_from_state(state* s)
+FPType local_obs<T>::get_from_state(state* s)
 {
-  double result=0.0;
+  FPType result=0.0;
   for (int i=0; i<this->_size; ++i)
     if (s->conf[i])
       result += 2.0*_spvs[i];
@@ -73,9 +73,9 @@ double local_obs<T>::get_from_state(state* s)
 }
 
 template<class T>
-double local_obs<T>::get_ensemble_average(double* nk)
+FPType local_obs<T>::get_ensemble_average(FPType* nk)
 {
-  double result=0.0;
+  FPType result=0.0;
   for (int i=0; i < this->_size; ++i)
     result += 2.0*nk[i]*_spvs[i];
   return this->_gsv + result;

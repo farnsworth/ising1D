@@ -33,29 +33,29 @@ class ising1D;
 /*!
   Local observable that contains the eigenstate of the Hamiltonian.
  */
-class energy : public local_obs<double>{
+class energy : public local_obs<FPType>{
 public:
-  energy( double *, int );
-  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  energy( FPType *, int );
+  FPType get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
 };
 
 
-class tmag : public local_obs<double>{
+class tmag : public local_obs<FPType>{
 public:
   tmag( ising1D *);
-  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-  static double _get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  FPType get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
+  static FPType _get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
   void set_spvs();
 private:
   ising1D * _system;
 };
 
 
-class localtmag : public local_obs<double>{
+class localtmag : public local_obs<FPType>{
 public:
   localtmag( int, ising1D * );
-  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-  static double _get_time_evolution( int,matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  FPType get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
+  static FPType _get_time_evolution( int,matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
   void set_spvs();
 private:
   ising1D * _system;
@@ -63,11 +63,11 @@ private:
 };
 
 
-class cidagacj : public local_obs< complex<double> >{
+class cidagacj : public local_obs< complex<FPType> >{
 public:
   cidagacj( int i, int j, ising1D * );
-  complex<double> get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-  static complex<double> _get_time_evolution( int i,int j,matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  complex<FPType> get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
+  static complex<FPType> _get_time_evolution( int i,int j,matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
   void set_spvs();
 private:
   ising1D * _system;
@@ -76,11 +76,11 @@ private:
 };
 
 
-class AiAj : public local_obs< complex<double> >{
+class AiAj : public local_obs< complex<FPType> >{
 public:
   AiAj(int i, int j, ising1D * );
-  complex<double> get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-  static complex<double> _get_time_evolution(int i, int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  complex<FPType> get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
+  static complex<FPType> _get_time_evolution(int i, int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
   void set_spvs();
   void set_gsv();
 private:
@@ -90,11 +90,11 @@ private:
 
 
 
-class BiBj : public local_obs< complex<double> >{
+class BiBj : public local_obs< complex<FPType> >{
 public:
   BiBj(int i, int j, ising1D * );
-  complex<double> get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-  static complex<double> _get_time_evolution(int i, int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  complex<FPType> get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
+  static complex<FPType> _get_time_evolution(int i, int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
   void set_spvs();
   void set_gsv();
 private:
@@ -104,11 +104,11 @@ private:
 
 
 
-class BiAj : public local_obs< double >{
+class BiAj : public local_obs< FPType >{
 public:
   BiAj(int i, int j, ising1D * );
-  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
-  static double _get_time_evolution(int i, int j, matrix< complex<double> > *UUt, matrix< complex<double> > *VVt );
+  FPType get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
+  static FPType _get_time_evolution(int i, int j, matrix< complex<FPType> > *UUt, matrix< complex<FPType> > *VVt );
   void set_spvs();
 private:
   ising1D * _system;
@@ -117,37 +117,37 @@ private:
 
 
 
-class rho : public obs<double>{
+class rho : public obs<FPType>{
 public:
   rho(int i, int r, ising1D *);
   ~rho();
   rho( const rho& source ); /*< copy constructor */
 
-  void set_ensemble_average(double* nk);
-  double get_ensemble_average(int l=-1);
+  void set_ensemble_average(FPType* nk);
+  FPType get_ensemble_average(int l=-1);
 
-  void set_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt );
-  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt );
-  double get_time_evolution(int l=-1);
+  void set_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt );
+  FPType get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt );
+  FPType get_time_evolution(int l=-1);
 private:
   ising1D *_system;
   //  quench  * _quench;
   int _r,_i;
   matrix< BiAj* > *_BiAjmatrix;
   void set_BiAjpointers();
-  matrix<double> *_reduced_matrix;
-  matrix< complex<double> > *_full_matrix;
+  matrix<FPType> *_reduced_matrix;
+  matrix< complex<FPType> > *_full_matrix;
 };
 
 
-class rhozz : public obs<double>{
+class rhozz : public obs<FPType>{
 public:
   rhozz(int i, int r, ising1D *);
   ~rhozz();
 
   void set_ensemble_average();
-  double get_ensemble_average(double* nk);
-  double get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt );
+  FPType get_ensemble_average(FPType* nk);
+  FPType get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt );
 private:
   ising1D *_system;
   int _r,_i;
@@ -160,45 +160,45 @@ private:
 
 
 
-double randomHH(int i, ising1D* system);
-double randomJJ(int i, ising1D* system);
+FPType randomHH(int i, ising1D* system);
+FPType randomJJ(int i, ising1D* system);
 
 // general 1D ising model object
 class ising1D{
 public:  
-  ising1D( int size_in, double h_in=_H_, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
+  ising1D( int size_in, FPType h_in=_H_, FPType J_in=_J_, FPType epsilon_in = _EPSILON_, FPType gamma_in=_GAMMA_, bool pbc_in=_PBC_,int seed=_SEED_);
 
-  ising1D( in_file *file, const string name="system", double (*JJgen)( int,ising1D* )=&randomJJ, double (*HHgen)( int,ising1D* )=&randomHH);
+  ising1D( in_file *file, const string name="system", FPType (*JJgen)( int,ising1D* )=&randomJJ, FPType (*HHgen)( int,ising1D* )=&randomHH);
   ~ising1D();
 
-  matrix<double> *UU,*VV;
+  matrix<FPType> *UU,*VV;
 
   void print();
   void write( out_file *);
   void read( in_file *, const string);
   int get_size();
-  double get_epsilon();
-  double get_h();
-  double get_J();
+  FPType get_epsilon();
+  FPType get_h();
+  FPType get_J();
   energy* e;
 
   friend class quench;
 
 private:
-  void init( double (*JJgen)( int,ising1D* ), double (*HHgen)( int,ising1D* ));
-  matrix<double>  get_hamiltonian();
+  void init( FPType (*JJgen)( int,ising1D* ), FPType (*HHgen)( int,ising1D* ));
+  matrix<FPType>  get_hamiltonian();
   void solve_diagonalization();
-  void check( double* eigenval, matrix<double> * eigvect );
-  matrix<double>  get_matrix_A();
-  matrix<double>  get_matrix_B();
+  void check( FPType* eigenval, matrix<FPType> * eigvect );
+  matrix<FPType>  get_matrix_A();
+  matrix<FPType>  get_matrix_B();
   int _seed;
   bool _pbc;
-  double _h,_J,_gamma;
-  double _epsilon;
-  double *_hh;
-  double *_JJ;
+  FPType _h,_J,_gamma;
+  FPType _epsilon;
+  FPType *_hh;
+  FPType *_JJ;
   // matrix that represent the Hamiltonian
-  matrix<double> *_hamiltonian;
+  matrix<FPType> *_hamiltonian;
   // length of the chain
   int size;
   bool _from_center; /**< generate disorder from the center of the chain or not */
@@ -208,24 +208,24 @@ private:
 
 class quench{
 public:
-  quench( int size_in, double h0_in, double h_in, double J_in=_J_, double epsilon_in = _EPSILON_, double gamma_in=_GAMMA_, bool pbc_in=_PBC_);
-  quench( in_file*,double (*JJgen0)( int,ising1D* )=&randomJJ, double (*HHgen0)( int,ising1D* )=&randomHH,double (*JJgen)( int,ising1D* )=&randomJJ, double (*HHgen)( int,ising1D* )=&randomHH );
+  quench( int size_in, FPType h0_in, FPType h_in, FPType J_in=_J_, FPType epsilon_in = _EPSILON_, FPType gamma_in=_GAMMA_, bool pbc_in=_PBC_);
+  quench( in_file*,FPType (*JJgen0)( int,ising1D* )=&randomJJ, FPType (*HHgen0)( int,ising1D* )=&randomHH,FPType (*JJgen)( int,ising1D* )=&randomJJ, FPType (*HHgen)( int,ising1D* )=&randomHH );
   ~quench();
 
-  matrix< complex<double> > *UUt,*VVt;
-  double* gge;
-  void set_time_evolution( const double );
-  void set_time_evolution( const double , matrix< complex<double> > *, matrix< complex<double> > * );
+  matrix< complex<FPType> > *UUt,*VVt;
+  FPType* gge;
+  void set_time_evolution( const FPType );
+  void set_time_evolution( const FPType , matrix< complex<FPType> > *, matrix< complex<FPType> > * );
   void set_gge_occupations( );
   int get_size();
-  double get_calpha2( state* );
+  FPType get_calpha2( state* );
 
   ising1D * system0;
   ising1D * system;
 private:
   int size;
   void init();
-  matrix< complex<double> > get_evolution_matrix(const double );
+  matrix< complex<FPType> > get_evolution_matrix(const FPType );
 };
 
 #endif

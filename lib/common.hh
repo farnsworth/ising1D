@@ -9,7 +9,8 @@
 #include "error.hh"
 #include <string>
 
-double fermi_dist(double, double);
+typedef float FPType;
+FPType fermi_dist(FPType, FPType);
 
 class state {
 public:
@@ -38,26 +39,26 @@ public:
   obs(const obs<T>& source);
   //  virtual double get_from_state(bool* state) = 0;
   // virtual double get_ensemble_average(double* nk) = 0;
-  virtual T get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt ) = 0;
+  virtual T get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt ) = 0;
 protected:
   int _size;
-  double _gsv;
+  FPType _gsv;
 };
 
 template<class T>
 class local_obs : public obs<T> {
 public:
   local_obs( int );
-  local_obs( double*, int );
+  local_obs( FPType*, int );
   local_obs(const local_obs<T>& source);
   ~local_obs();
-  double get_from_state(state*);
-  double get_ensemble_average(double* nk);
+  FPType get_from_state(state*);
+  FPType get_ensemble_average(FPType* nk);
   void set_gsv();
-  virtual T get_time_evolution( matrix< complex<double> > *UUt, matrix< complex<double> > * VVt )=0;
-  double get_spv( int );
+  virtual T get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt )=0;
+  FPType get_spv( int );
 protected:
-  double* _spvs;
+  FPType* _spvs;
 };
 
 
