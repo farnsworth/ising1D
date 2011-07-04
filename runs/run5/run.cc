@@ -10,30 +10,25 @@
 using namespace std;
 
 
-double genHH0(int i,ising1D* system)
+FPType genHH0(int i,ising1D* system)
 {
   return system->get_h();
 }
 
 
-double genJJ0(int i,ising1D* system)
+FPType genJJ0(int i,ising1D* system)
 {
   return system->get_J();
 }
 
 
-double genHH(int i,ising1D* system)
+FPType genHH(int i,FPType sigma, ising1D* system)
 {
-  if (i != system->get_size()/2){
-    return system->get_h();
-  }
-  else{
-    return 1.5*system->get_h();
-  }
+  return system->get_h() + system->get_epsilon()*exp(double( pow(i - system->get_size()/2, 2 ) )/(2*sigma*sigma) )
 }
 
 
-double genJJ(int i,ising1D* system)
+FPType genJJ(int i,ising1D* system)
 {
   return system->get_J();
 }
@@ -44,7 +39,7 @@ int main(int argc, char *argv[])
 {
   if (argc > 1){
 
-    double t;
+    FPType t,sigma;
     string name,data,fileout="file.out";
 
     string filename = argv[1];
@@ -54,13 +49,15 @@ int main(int argc, char *argv[])
     while ( ifile.read_data(name,data)>0){
       if (name=="fileout")
 	fileout = data;
+      else if (name=="sigma")
+	istringstream(data) >> sigma;
     }
 
     out_file ofile(fileout);
 
     ofile.copyfile( &ifile );
 
-    loop<double> time_loop( &ifile, "time_loop");
+    loop<FPType> time_loop( &ifile, "time_loop");
 
     quench gigi( &ifile,&genJJ0,&genHH0,&genJJ,&genHH);
     //quench gigi( &ifile);
@@ -69,23 +66,23 @@ int main(int argc, char *argv[])
 
     tmag tmag1( gigi.system );
     tmag1.set_spvs();
-    double mgge = tmag1.get_ensemble_average( gigi.gge )/double(gigi.get_size());
+    FPType mgge = tmag1.get_ensemble_average( gigi.gge )/double(gigi.get_size());
 
     localtmag ltmag(size/2,gigi.system);
     ltmag.set_spvs();
-    double lgge = ltmag.get_ensemble_average( gigi.gge );
+    FPType lgge = ltmag.get_ensemble_average( gigi.gge );
 
     cidagacj cicj1(size/2,size/2+5,gigi.system);
     cicj1.set_spvs();
-    double cicj1gge = cicj1.get_ensemble_average( gigi.gge );
+    FPType cicj1gge = cicj1.get_ensemble_average( gigi.gge );
 
     cidagacj cicj2(size/2,size/2+10,gigi.system);
     cicj2.set_spvs();
-    double cicj2gge = cicj2.get_ensemble_average( gigi.gge );
+    FPType cicj2gge = cicj2.get_ensemble_average( gigi.gge );
     
     ofile << setprecision(15) << setw(25);
 
-    complex<double> temp;
+    complex<FPType> temp;
 
     while (time_loop.next()){
       t = time_loop.get_val();
