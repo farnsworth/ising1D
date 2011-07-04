@@ -7,12 +7,16 @@
 #include <iomanip>
 #include <cmath>
 #include <complex>
-#ifdef BLAS
+#if defined(BLAS) || defined(MIXED)
 #ifdef __APPLE__
 #include <vecLib/cblas.h>
 #else
 #include <gsl/gsl_cblas.h>
 #endif
+#endif
+#if defined(CUDA) || defined(MIXED)
+#include<cublas.h>
+//#include<cublas_v2.h>
 #endif
 using namespace std;
 

@@ -181,11 +181,16 @@ public:
   FPType get_h();
   FPType get_J();
   energy* e;
+  void gendis( FPType (*JJgen)( int,ising1D* )=&randomJJ, FPType (*HHgen)( int,ising1D* )=&randomHH);
+
+  matrix< complex<FPType> > getEvolutionMatrix(const FPType );
+
+  matrix< complex<FPType> > temp( const FPType time );
 
   friend class quench;
 
 private:
-  void init( FPType (*JJgen)( int,ising1D* ), FPType (*HHgen)( int,ising1D* ));
+  void init();
   matrix<FPType>  get_hamiltonian();
   void solve_diagonalization();
   void check( FPType* eigenval, matrix<FPType> * eigvect );
@@ -225,7 +230,7 @@ public:
 private:
   int size;
   void init();
-  matrix< complex<FPType> > get_evolution_matrix(const FPType );
+  //matrix< complex<FPType> > get_evolution_matrix(const FPType );
 };
 
 #endif

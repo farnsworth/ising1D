@@ -213,6 +213,8 @@ template <>
 matrix<float> gemm( const matrix<float> &a, const char transa, const matrix<float> &b, const char transb)
 {
 
+  //  cout << "You are using blas lib";
+
   // cout << "you are using float gemm routine" << endl;
 
   enum CBLAS_ORDER order = CblasRowMajor;  
@@ -235,7 +237,7 @@ matrix<float> gemm( const matrix<float> &a, const char transa, const matrix<floa
   int LDB = ( (transb=='N')||(transb=='n') ) ? N : K;
   int LDC = N;
 
-  float ALPHA = 1.0, BETA = 0.0;
+  float ALPHA = 1.0f, BETA = 0.0f;
 
 
   cblas_sgemm( order, btransa, btransb, M, N, K, ALPHA, a.pointer, LDA, b.pointer, LDB,BETA, result.pointer, LDC );
@@ -243,7 +245,69 @@ matrix<float> gemm( const matrix<float> &a, const char transa, const matrix<floa
   return result;
 }
 
+#elif defined(MIXED) || defined(CUDA)
 
+template <>
+matrix<float> gemm( const matrix<float> &a, const char transa, const matrix<float> &b, const char transb)
+{
+  //  cout << "You are using cublas lib";
+  int M = ( (transb=='N')||(transb=='n') ) ? b.ncol : b.nrow;
+  int N = ( (transa=='N')||(transa=='n') ) ? a.nrow : a.ncol;
+  int K = ( (transa=='N')||(transa=='n') ) ? b.nrow : b.ncol;
+  int Kcheck = ( (transb=='N')||(transb=='n') ) ? a.ncol : a.nrow;
+
+  matrix<float> result(N,M);
+
+  if ( (K != Kcheck) )
+    _ERROR_("incompatible matrices",result);
+
+  int LDA = ( (transa=='N')||(transa=='n') ) ? M : K;
+  int LDB = ( (transb=='N')||(transb=='n') ) ? K : N;
+  int LDC = M;
+
+
+  cublasStatus stat;
+  stat = cublasInit();
+
+  float *devicePtr_A,*devicePtr_B,*devicePtr_C;
+
+  cublasAlloc (M*K, sizeof(*b.pointer) , (void **)&devicePtr_A );
+  cublasAlloc (N*K, sizeof(*a.pointer) , (void **)&devicePtr_B );
+  cublasAlloc (N*M, sizeof(*result.pointer) , (void **)&devicePtr_C );
+
+  //Both matrices are assumed to be stored in
+  //column‐major format
+  cublasSetMatrix (b.ncol, b.nrow, sizeof(*b.pointer), b.pointer, b.ncol, devicePtr_A, b.ncol);
+  cublasSetMatrix (a.ncol, a.nrow, sizeof(*a.pointer), a.pointer, a.ncol, devicePtr_B, a.ncol);
+  cublasSetMatrix (result.ncol, result.nrow, sizeof(*result.pointer), result.pointer, result.ncol, devicePtr_C, result.ncol);
+  
+  float ALPHA = 1.0f, BETA = 0.0f;
+
+  cublasSgemm ( transa, transb, M, N, K, ALPHA, devicePtr_A, LDA, devicePtr_B, LDB, BETA, devicePtr_C, LDC);
+
+  cublasGetMatrix ( N, M, sizeof(*result.pointer), devicePtr_C , N, result.pointer, N);
+
+  cublasFree ( devicePtr_A );
+  cublasFree ( devicePtr_B );
+  cublasFree ( devicePtr_C );
+
+  cublasGetError();
+  stat = cublasShutdown();
+
+  /*
+
+  if (stat != CUBLAS_STATUS_SUCCESS) {
+    printf ("device memory allocation failed");
+    return 1;
+    } */
+
+  return result;
+} 
+
+#endif
+
+
+#if defined(BLAS) || defined(MIXED)
 template <>
 matrix<double> gemm( const matrix<double> &a, const char transa, const matrix<double> &b, const char transb)
 {

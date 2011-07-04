@@ -293,7 +293,7 @@ template <>
 complex<double> matrix< complex<double> >::det();
 
 
-#ifdef BLAS
+#if defined(BLAS) || defined(MIXED) || defined(CUDA)
 template<>
 matrix<float> gemm( const matrix<float> &a, const char trana, const matrix<float> &b, const char tranb);
 

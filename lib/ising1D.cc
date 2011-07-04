@@ -533,7 +533,10 @@ ising1D::ising1D( in_file* file, const string name, FPType (*JJgen)(int,ising1D*
   _seed = _SEED_;
   _from_center = _FROM_CENTER_;
   read( file, name );
-  init( (*JJgen), (*HHgen) );
+
+  init();
+  gendis( (*JJgen), (*HHgen) );
+
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
@@ -550,14 +553,17 @@ ising1D::ising1D(int size_in, FPType h, FPType J, FPType epsilon, FPType gamma, 
   _epsilon = epsilon;
   _seed = seed;
   _from_center = _FROM_CENTER_;
-  init( (&randomJJ),(&randomHH));
+
+  init();
+  gendis( (&randomJJ),(&randomHH));
+
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
 }
 
 
-void ising1D::init( FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*))
+void ising1D::init()
 {
   if (size<1)
     _ERROR_("Non valid value of size",);
@@ -579,14 +585,19 @@ void ising1D::init( FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*))
   VV = new matrix<FPType>(size,size);
   _JJ = new FPType[size];
   _hh = new FPType[size];
+  e = NULL;
 
+#ifdef DEBUG
+  _ERROR_TRACKING_;
+#endif
+}
+
+
+void ising1D::gendis( FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*))
+{
   if (_from_center){
     _MESSAGE_("Disorder is generated from the center of the chain");
     for (int i=0;i<size/2;++i){
-      //_hh[size/2 - i - 1] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      //_hh[size/2 + i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      //_JJ[size/2 - i - 1] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      //_JJ[size/2 + i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
       _hh[size/2 - i - 1] = (*HHgen)(size/2 - i - 1,this);
       _hh[size/2 + i] = (*HHgen)(size/2 + i,this);
       _JJ[size/2 - i - 1] = (*JJgen)(size/2 - i - 1,this);
@@ -595,23 +606,18 @@ void ising1D::init( FPType (*JJgen)(int,ising1D*),FPType (*HHgen)(int,ising1D*))
   }
   else
     for (int i=0;i<size;++i){
-      //_hh[i] = _h * (1.0 + 2.0*_epsilon*(drand1()-0.5));
-      //_JJ[i] = _J * (1.0 + 2.0*_epsilon*(drand1()-0.5));
       _hh[i] = (*HHgen)(i,this);
       _JJ[i] = (*JJgen)(i,this);
     }
 
-  //  for (int i=45;i<55;++i){
-  //  cout << _hh[i] << "\t" << _JJ[i] << endl; 
-  //}
-
   (*_hamiltonian) = get_hamiltonian();
-  solve_diagonalization();
 
+  solve_diagonalization();
 #ifdef DEBUG
   _ERROR_TRACKING_;
 #endif
 }
+
 
 
 
@@ -667,6 +673,11 @@ void ising1D::solve_diagonalization()
     //cout << eigenval[i] << endl;
   }
 
+  if (e != NULL){
+    delete e;
+    e = NULL;
+  }
+  
   e = new energy(eigenval, size);
 
   for (int irow=0;irow<size;++irow)
@@ -910,6 +921,44 @@ void ising1D::read( in_file* file,const string systemname)
 }
 
 
+matrix< complex<FPType> > ising1D::temp( const FPType time )
+{
+  matrix< complex<FPType> > te = getEvolutionMatrix(time);
+  matrix< complex<FPType> > tec = te.conjugate();
+  matrix< complex<FPType> > AA(size,size);
+  //matrix< complex<FPType> > BB(size,size);
+  
+  //AA = gemm( *(system->UU),'N',gemm(te,'N', *system->UU,'D'),'N');
+  //  AA = AA + gemm(system->VV->conjugate(),'N',gemm(tec,'N',*system->VV,'T'),'N');
+  AA = gemm(VV->conjugate(),'N',gemm(tec,'N',*VV,'T'),'N');
+  return AA;
+  //BB = gemm(*(system->VV),'N', gemm(te,'N',*system->UU,'D'),'N');
+  //BB = BB + gemm( system->UU->conjugate(),'N',gemm(tec,'N',*system->VV,'T'),'N');
+  
+
+#ifdef DEBUG
+  _ERROR_TRACKING_;
+#endif
+}
+
+matrix< complex<FPType> > ising1D::getEvolutionMatrix( const FPType time )
+{
+  matrix< complex<FPType> > temp(size,size);
+  complex<FPType> imath(0.0,1.0);
+  FPType two=2.0;
+  
+  temp = complex<FPType>(0.0,0.0);
+  for (int i=0;i<size;++i)
+    temp(i,i) = exp(- two*e->get_spv(i) * time * imath );
+
+#ifdef DEBUG
+  _ERROR_TRACKING_;
+#endif
+  return temp;
+}
+
+
+
 quench::quench( int size_in, FPType h0, FPType h, FPType J, FPType epsilon, FPType gamma, bool pbc)
 {
   system0 = new ising1D(size_in, h0, J, epsilon, gamma, pbc);
@@ -982,7 +1031,7 @@ void quench::set_gge_occupations()
 
 void quench::set_time_evolution( const FPType time, matrix<complex<FPType> > * UU, matrix<complex<FPType> > * VV )
 {
-  matrix< complex<FPType> > te = get_evolution_matrix(time);
+  matrix< complex<FPType> > te = system->getEvolutionMatrix(time);
   matrix< complex<FPType> > tec = te.conjugate();
   matrix< complex<FPType> > AA(size,size);
   matrix< complex<FPType> > BB(size,size);
@@ -1016,21 +1065,21 @@ void quench::set_time_evolution( const FPType time )
 }
 
 
-matrix< complex<FPType> > quench::get_evolution_matrix( const FPType time )
-{
-  matrix< complex<FPType> > temp(size,size);
-  complex<FPType> imath(0.0,1.0);
-  FPType two=2.0;
-  
-  temp = complex<FPType>(0.0,0.0);
-  for (int i=0;i<size;++i)
-    temp(i,i) = exp(- two*system->e->get_spv(i) * time * imath );
-
-#ifdef DEBUG
-  _ERROR_TRACKING_;
-#endif
-  return temp;
-}
+//matrix< complex<FPType> > quench::get_evolution_matrix( const FPType time )
+//{
+//  matrix< complex<FPType> > temp(size,size);
+//  complex<FPType> imath(0.0,1.0);
+//  FPType two=2.0;
+//  
+//  temp = complex<FPType>(0.0,0.0);
+//  for (int i=0;i<size;++i)
+//    temp(i,i) = exp(- two*system->e->get_spv(i) * time * imath );
+//
+//#ifdef DEBUG
+//  _ERROR_TRACKING_;
+//#endif
+//  return temp;
+//}
 
 FPType quench::get_calpha2( state* s)
 {

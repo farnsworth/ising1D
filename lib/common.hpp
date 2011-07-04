@@ -18,6 +18,7 @@ local_obs<T>::local_obs( int size_in) : obs<T>(size_in)
   this->_spvs = NULL;
 }
 
+
 template<class T>
 local_obs<T>::local_obs( FPType* val, int size_in) : obs<T>(size_in)
 {
@@ -81,7 +82,10 @@ FPType local_obs<T>::get_ensemble_average(FPType* nk)
   return this->_gsv + result;
 }
 
-
+template<class T>
+FPType* local_obs<T>::getSpvsPointer(){
+  return _spvs;
+}
 
 template<class T>
 loop<T>::loop( int steps, T delta, T initval  )
@@ -160,7 +164,6 @@ void loop<T>::splitOMP()
 #endif
 }
 
-
 template<class T>
 bool loop<T>::again()
 {
@@ -211,3 +214,108 @@ int loop<int>::get_max_val();
 
 template<>
 float loop<float>::get_max_val();
+
+
+template<class T>
+histogramm<T>::histogramm( T xmin , T xmax, int nbin ){
+  _xmin = xmin;
+  _xmax = xmax;
+  _nbin = nbin;
+  _xdelta = (_xmax-_xmin)/T(_nbin);
+  _hist = new int[nbin];
+  for (int ibin=0;ibin<_nbin;++ibin){
+    _hist[ibin] = 0;
+  }
+  _ndata = 0;
+}
+
+
+template<class T>
+histogramm<T>::~histogramm(){
+  delete [] _hist;
+}
+
+
+template<class T>
+void histogramm<T>::putData( T x){
+  putData(&x,1);
+}
+
+
+template<class T>
+void histogramm<T>::putData( T *x, int ndata){
+  int ibin;
+  _ndata += ndata;
+  for (int idata=0;idata<ndata;++idata){
+    ibin = int( ( x[idata] - _xmin ) / _xdelta );
+    if ( (ibin>=0) and (ibin<_nbin) )
+      _hist[ibin] += 1;
+  }
+}
+
+
+template <class T>
+ostream& operator<<( ostream& out, const histogramm<T> &h )
+{
+  T xbin = h._xmin+0.5*h._xdelta;
+  for (int ibin=0;ibin<h._nbin;++ibin){
+    out << xbin << "\t" << double(h._hist[ibin])/(double(h._ndata)*h._xdelta);
+    out << endl;
+    xbin += h._xdelta;
+  }
+  cout << "ndata" << h._ndata << endl;
+  return out;
+}
+
+
+template<class T>
+wHistogramm<T>::wHistogramm( T xmin , T xmax, int nbin ){
+  _xMin = xmin;
+  _xMax = xmax;
+  _nBin = nbin;
+  _xDelta = (_xMax-_xMin)/T(_nBin);
+  _wHist = new T[nbin];
+  for (int ibin=0;ibin<_nBin;++ibin){
+    _wHist[ibin] = T(0);
+  }
+  _totWeight = T(0);
+}
+
+
+template<class T>
+wHistogramm<T>::~wHistogramm(){
+  delete [] _wHist;
+}
+
+
+template<class T>
+void wHistogramm<T>::putData( T x, T w){
+  putData(&x,&w,1);
+}
+
+
+template<class T>
+void wHistogramm<T>::putData( T *x, T *w, int ndata){
+  int ibin;
+  for (int idata=0;idata<ndata;++idata){
+    ibin = int( ( x[idata] - _xMin ) / _xDelta );
+    if ( (ibin>=0) and (ibin<_nBin) ){
+      _wHist[ibin] += w[idata];
+      _totWeight += w[idata];
+    }
+  }
+}
+
+
+template <class T>
+ostream& operator<<( ostream& out, const wHistogramm<T> &h )
+{
+  T xbin = h._xMin+0.5*h._xDelta;
+  for (int ibin=0;ibin<h._nBin;++ibin){
+    out << xbin << "\t" << h._wHist[ibin]/(h._totWeight * h._xDelta);
+    out << endl;
+    xbin += h._xDelta;
+  }
+  //cout << "ndata" << h._ndata << endl;
+  return out;
+}

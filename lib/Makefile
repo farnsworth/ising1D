@@ -17,6 +17,7 @@ OBJECTS = $(SOURCE:.cc=.o)
 HEADERS = $(shell ls *.hh)
 HEADERS_CODE = $(shell ls *.hpp)
 
+CUDA_INSTALL_PATH=/usr/local/cuda
 INCLUDEDIR=-I../external/
 FLAGS += -O3 -DUSUAL_ALG
 #-DDK_ALG
@@ -26,6 +27,14 @@ default: $(HEADERS) $(HEADERS_CODE) $(OBJECTS)
 
 blas: FLAGS += -DBLAS
 blas: default
+
+cuda: FLAGS += -DCUDA
+cuda: INCLUDEDIR += -I$(CUDA_INSTALL_PATH)/include
+cuda: default
+
+mixed: FLAGS += -DMIXED
+mixed: INCLUDEDIR += -I$(CUDA_INSTALL_PATH)/include
+mixed: default 
 
 clean:
 	@rm -f *.o *~
