@@ -41,6 +41,7 @@ public:
   //  virtual double get_from_state(bool* state) = 0;
   // virtual double get_ensemble_average(double* nk) = 0;
   virtual T get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt ) = 0;
+  FPType get_gsv();
 protected:
   int _size;
   FPType _gsv;

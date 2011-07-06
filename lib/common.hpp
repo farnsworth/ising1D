@@ -11,6 +11,12 @@ obs<T>::obs( const obs<T>& source)
   _gsv  = source._gsv;
 }
 
+template<class T>
+FPType obs<T>::get_gsv()
+{
+  return _gsv;
+}
+
 
 template<class T>
 local_obs<T>::local_obs( int size_in) : obs<T>(size_in)
