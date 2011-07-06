@@ -459,18 +459,29 @@ rho::~rho()
 
 rhozz::rhozz( int i,int r, ising1D * system) : obs<FPType>( system->get_size())
 {
-  if ((i+r > system->get_size()) || (i < 0)){
+  if ((i > system->get_size()) || (i < 0)){
     _ERROR_("indexes outside the chain",);
+  }
+  if ( i+r >= system->get_size() ){
+    _MESSAGE_("second site is outside the chain");
   }
   _system = system;
   _r = r;
   _i = i;
+  int secondSite = _i+_r;
+
+  if (secondSite >= system->get_size() ){
+    secondSite = secondSite % system->get_size();
+    _MESSAGE_("second site has been put inside");
+    //_r = secondSite - _i;
+  }
+
   _BlAl = new BiAj(i,i,system);
-  _BmAm = new BiAj(i+r, i+r, system);
-  _BmAl = new BiAj(i+r, i, system);
-  _BlAm = new BiAj(i, i+r, system);
-  _AlAm = new AiAj(i, i+r, system);
-  _BlBm = new BiBj(i, i+r, system);
+  _BmAm = new BiAj(secondSite, secondSite , system);
+  _BmAl = new BiAj(secondSite, i, system);
+  _BlAm = new BiAj(i, secondSite, system);
+  _AlAm = new AiAj(i, secondSite, system);
+  _BlBm = new BiBj(i, secondSite, system);
 }
 
 void rhozz::set_ensemble_average()
@@ -1036,16 +1047,6 @@ void quench::set_time_evolution( const FPType time, matrix<complex<FPType> > * U
   matrix< complex<FPType> > AA(size,size);
   matrix< complex<FPType> > BB(size,size);
   
-  /* we can optimize this part */
-
-  //  AA = *(system->UU) *gemm(te,'N', *system->UU,'C');
-  //AA = AA + (system->VV->conjugate() * tec * system->VV->transpose());
-  // BB = *(system->VV) * te * system->UU->daga();
-  //BB = BB + (system->UU->conjugate() * tec * system->VV->transpose());
-  
-  //(*UU) = AA * *(system0->UU) + BB.conjugate() * *(system0->VV);
-  //(*VV) = BB * *(system0->UU) + AA.conjugate() * *(system0->VV);
-
   AA = gemm( *(system->UU),'N',gemm(te,'N', *system->UU,'D'),'N');
   AA = AA + gemm(system->VV->conjugate(),'N',gemm(tec,'N',*system->VV,'T'),'N');
   BB = gemm(*(system->VV),'N', gemm(te,'N',*system->UU,'D'),'N');
