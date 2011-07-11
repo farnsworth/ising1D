@@ -73,23 +73,22 @@ int main(int argc, char *argv[])
 
     int size = gigi.get_size();
 
-    rho **rhovect;
-    rhovect = new rho*[size];
-    FPType *rhogge;
-    rhogge = new FPType[size];
+    rhozz **rhozzvect;
+    rhozzvect = new rhozz*[size];
+    FPType *rhozzgge;
+    rhozzgge = new FPType[size];
 
-    int dist = 10;
-    for (int isite=0;isite<size-dist;++isite){
-      rhovect[isite] = new rho( isite,dist, gigi.system );
-      rhovect[isite]->set_ensemble_average( gigi.gge );
-      rhogge[isite]  = rhovect[isite]->get_ensemble_average( dist );
+    for (int isite=0;isite<size;++isite){
+      rhozzvect[isite] = new rhozz( isite,1, gigi.system );
+      rhozzvect[isite]->set_ensemble_average();
+      rhozzgge[isite]  = rhozzvect[isite]->get_ensemble_average( gigi.gge );
     }
 
    
     ofile1 << setprecision(15) << setw(25);
     ofile2 << setprecision(15) << setw(25);
 
-    int ndata = 8;
+    int ndata = 5;
     int every = 5;
     matrix<FPType> outdata1(time_loop.get_steps(),2*ndata+1);
     matrix<FPType> outdata2(size,2);
@@ -111,15 +110,14 @@ int main(int argc, char *argv[])
 	gigi.set_time_evolution(t,&UU,&VV);
 
 
-	for (int isite = 0;isite<size-dist;++isite){
-	  rhovect[isite]->set_time_evolution( &UU, &VV);
-	  outdata2(isite,0) = rhovect[isite]->get_time_evolution(dist);
-	  outdata2(isite,1) = rhogge[isite];
+	for (int isite = 0;isite<size;++isite){
+	  outdata2(isite,0) = rhozzvect[isite]->get_time_evolution( &UU, &VV);
+	  outdata2(isite,1) = rhozzgge[isite];
 	  if ( isite >= size/2){
 	    int temp = isite-size/2;
 	    if (( temp % every == 0 ) && ( temp/every < ndata )){
 	      outdata1(ii,2*(temp/every)+1) = outdata2(isite,0);
-	      outdata1(ii,2*(temp/every)+2) = rhogge[isite];
+	      outdata1(ii,2*(temp/every)+2) = rhozzgge[isite];
 	    }
 	  }
 	}
@@ -131,11 +129,11 @@ int main(int argc, char *argv[])
       }
       ofile1 << outdata1;
     }
-    delete [] rhogge;
-    for (int isite=0;isite<size-dist;++isite){
-      delete rhovect[isite];
+    delete [] rhozzgge;
+    for (int isite=0;isite<size;++isite){
+      delete rhozzvect[isite];
     }
-    delete [] rhovect;
+    delete [] rhozzvect;
   }
   else
     _ERROR_("no file name given",-1);
