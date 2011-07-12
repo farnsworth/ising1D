@@ -386,7 +386,9 @@ FPType rho::get_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<
 
 void rho::set_time_evolution( matrix< complex<FPType> > *UUt, matrix< complex<FPType> > * VVt ){
   int i,j;
-  _full_matrix = new matrix<complex<FPType> >(2*_r,2*_r);
+
+  if (_full_matrix == NULL)
+    _full_matrix = new matrix<complex<FPType> >(2*_r,2*_r);
   
   *_full_matrix = complex<FPType>(0.0,0.0);
   for (int irow=0;irow<2*_r;++irow){
