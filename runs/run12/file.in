@@ -1,0 +1,24 @@
+
+[parameters]
+fileout fileN800.out
+delta 10
+
+[system0]
+size 800
+h 1.2
+J 1
+gamma 1
+epsilon 0.5
+pbc 1
+from_center 1
+seed 2
+
+[system]
+size 800
+h 0.5
+J 1
+gamma 1
+epsilon 0.0
+pbc 1
+from_center 1
+seed 1
