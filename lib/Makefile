@@ -10,7 +10,7 @@ ifneq ($(strip $(shell which icpc)),)
 endif
 
 
-SOURCE = $(shell ls *.cc)
+SOURCE = $(shell ls *.cc | grep -v "generators.cc")
 
 OBJECTS = $(SOURCE:.cc=.o)
 
@@ -34,7 +34,7 @@ cuda: default
 
 mixed: FLAGS += -DMIXED
 mixed: INCLUDEDIR += -I$(CUDA_INSTALL_PATH)/include
-mixed: default 
+mixed: default
 
 clean:
 	@rm -f *.o *~

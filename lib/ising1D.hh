@@ -2,7 +2,7 @@
 /*!
  * ising1D.hh
  * Purpose: definitons of objects that describes the general ising model
- * with transverse field (general means without imposing order) and its
+ * with transverse field (general means without imposing homogeneity) and its
  * observables
  * @author Simone Ziraldo
  * @version 0.1 19/04/2011
@@ -162,6 +162,10 @@ private:
 
 FPType randomHH(int i, ising1D* system);
 FPType randomJJ(int i, ising1D* system);
+FPType homogeneousJJ( int i, ising1D* system);
+FPType homogeneousHH( int i, ising1D* system);
+
+
 
 // general 1D ising model object
 class ising1D{
@@ -224,6 +228,10 @@ public:
   void set_gge_occupations( );
   int get_size();
   FPType get_calpha2( state* );
+
+  matrix< FPType > getCorrelations();
+  matrix< FPType > getCorrelationsDagaDaga();
+
 
   ising1D * system0;
   ising1D * system;

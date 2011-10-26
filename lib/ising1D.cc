@@ -1068,6 +1068,23 @@ void quench::set_time_evolution( const FPType time )
 }
 
 
+matrix<FPType> quench::getCorrelations(){
+  matrix< FPType > temp1(size,size), temp2(size,size);
+
+  temp1 = gemm( *(system->VV),'T',*(system0->UU),'N') + gemm( *(system->UU),'T',*(system0->VV),'N');
+  temp2 = gemm( *(system0->VV),'T',*(system->UU),'N') + gemm( *(system0->UU),'T',*(system->VV),'N');
+  return gemm(temp1,'N',temp2,'N');
+}
+
+
+matrix<FPType> quench::getCorrelationsDagaDaga(){
+  matrix< FPType > temp1(size,size), temp2(size,size);
+
+  temp1 = gemm( *(system->VV),'T',*(system0->UU),'N') + gemm( *(system->UU),'T',*(system0->VV),'N');
+  temp2 = gemm( *(system0->VV),'T',*(system->VV),'N') + gemm( *(system0->UU),'T',*(system->UU),'N');
+  return gemm(temp1,'N',temp2,'N');
+}
+
 //matrix< complex<FPType> > quench::get_evolution_matrix( const FPType time )
 //{
 //  matrix< complex<FPType> > temp(size,size);
