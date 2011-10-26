@@ -1,0 +1,9 @@
+[parameters]
+fileout file-200x5.out
+h 0.5
+j1 1
+j2 1
+n 5
+Ntot 200
+delta 0.1
+ntime 5000
