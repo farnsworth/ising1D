@@ -1,0 +1,26 @@
+[parameters]
+fileout file-3.out
+delta 20
+
+[time_loop]
+delta 0.4
+steps 1000
+initval = 0.0
+
+[system0]
+size 800
+h 0.0
+J 1
+gamma 1
+epsilon 0.0
+pbc 1
+seed 54
+
+[system]
+size 800
+h 0.5
+J 1
+gamma 1
+epsilon 0.0
+pbc 1
+seed 54
